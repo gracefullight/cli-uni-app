@@ -23,6 +23,12 @@
         "name": "Subject 4",
         "mark": 30,
         "grade": "F"
+      },
+      {
+        "subject_id": "830",
+        "name": "Subject 4",
+        "mark": 6,
+        "grade": "F"
       }
     ]
   },
