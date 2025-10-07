@@ -1,0 +1,376 @@
+I'll scan the key files to extract exact function locations and prepare concise, line-numbered snippets for each member's section.
+
+[2 tools called]
+
+### Member 1 – University main menu, Student system, registration/login with validation
+
+- Key snippets
+
+```52:66:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def validate_email(email: str) -> bool:
+    """Validate email format: firstname.lastname@university.com"""
+    pattern = r"^[a-z]+\.[a-z]+@university\.com$"
+    return re.match(pattern, email) is not None
+
+def validate_password(password: str) -> bool:
+    """Validate password: starts with uppercase, 5+ letters total, ending with 3 digits."""
+    pattern = r"^[A-Z][A-Za-z]{4,}\d{3}$"
+    return re.match(pattern, password) is not None
+```
+
+```234:245:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def run(self) -> None:
+    while True:
+        clear_screen()
+        print("==============================")
+        print("      University System")
+        print("==============================")
+        print("1. Student")
+        print("2. Admin")
+        print("3. Exit")
+        choice = input("Select an option: ").strip()
+```
+
+```256:274:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def menu_student(self) -> None:
+    while True:
+        clear_screen()
+        print("------ Student Menu ------")
+        print("1. Register")
+        print("2. Login")
+        print("3. Back")
+        choice = input("Select an option: ").strip()
+        if choice == "1":
+            self.student_register()
+        elif choice == "2":
+            student = self.student_login()
+            if student:
+                self.menu_subject_enrollment(student)
+```
+
+```328:360:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def student_register(self) -> None:
+    clear_screen()
+    print("------ Student Registration ------")
+    first_name = input("First name: ").strip()
+    last_name = input("Last name: ").strip()
+    email = input("Email (firstname.lastname@university.com): ").strip().lower()
+    password = input("Password (Start uppercase, 5+ letters, end with 3 digits): ").strip()
+    if not validate_email(email): ...
+    if not validate_password(password): ...
+    fname_part, lname_part = email.split("@")[0].split(".")
+    if fname_part != first_name.lower() or lname_part != last_name.lower(): ...
+    ok, msg, _student = self.db.add_student(first_name, last_name, email, password)
+    print(msg)
+```
+
+```361:373:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def student_login(self) -> Optional[Student]:
+    clear_screen()
+    print("------ Student Login ------")
+    email = input("Email: ").strip().lower()
+    password = input("Password: ").strip()
+    student = self.db.get_student_by_email(email)
+    if not student or student.password != password:
+        print("Error: Invalid email or password.")
+        pause()
+        return None
+    print(f"Welcome, {student.first_name}!")
+    pause("Press Enter to continue to Subject Enrollment...")
+    return student
+```
+
+- What/importance
+  - Input validation blocks bad data early; consistent rules between CLI and GUI.
+  - Student menu orchestrates registration and login flow.
+  - Registration enforces email-name consistency and uniqueness via database.
+  - Login authenticates and transitions into the enrollment sub-menu.
+
+- How it fits overall
+  - Entry point for students; after login, control moves to subject management.
+
+- Present like this
+  - Start with validators; show how they’re used in `student_register`/`student_login`.
+  - Demo flow: bad email/password → errors; then successful registration → login.
+
+- Tasks/contributions
+  - University/Student menus
+  - Registration + validations
+  - Login + transitions
+  - Database integration for create/auth
+
+- Tips
+  - Keep it user-centric: “When a student registers, these checks run. If OK, this DB call saves the record.”
+
+
+### Member 2 – Subject enrollment, add/remove, mark & grade
+
+- Key snippets
+
+```69:79:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def calculate_grade(mark: int) -> str:
+    if mark >= 85: return "HD"
+    if mark >= 75: return "D"
+    if mark >= 65: return "C"
+    if mark >= 50: return "P"
+    return "F"
+```
+
+```82:98:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+@dataclass
+class Subject:
+    subject_id: str
+    name: str
+    mark: int
+    grade: str
+
+    @staticmethod
+    def create(name: str, existing_ids: set[str]) -> "Subject":
+        subject_id = generate_unique_id(existing_ids, 3)
+        mark = random.randint(0, 100)
+        grade = calculate_grade(mark)
+        return Subject(subject_id=subject_id, name=name, mark=mark, grade=grade)
+```
+
+```303:312:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def menu_subject_enrollment(self, student: Student) -> None:
+    ...
+    print("1. View Enrollment")
+    print("2. Enroll in Subject")
+    print("3. Remove Subject")
+    print("4. Change Password")
+    print("5. Logout")
+```
+
+```388:410:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def student_enroll_subject(self, student: Student) -> None:
+    if len(student.subjects) >= MAX_SUBJECTS_PER_STUDENT: ...
+    name = input("Subject name: ").strip()
+    if not name: ...
+    if any(s.name.lower() == name.lower() for s in student.subjects): ...
+    existing_ids = {s.subject_id for s in student.subjects}
+    subject = Subject.create(name=name, existing_ids=existing_ids)
+    student.subjects.append(subject)
+    self.db.update_student(student)
+    print(f"Success: Enrolled in {subject.name} ... Mark: {subject.mark}, Grade: {subject.grade}")
+```
+
+```412:430:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def student_remove_subject(self, student: Student) -> None:
+    if not student.subjects: ...
+    for s in student.subjects:
+        print(f"[{s.subject_id}] {s.name}")
+    subject_id = input("Enter Subject ID to remove: ").strip()
+    for idx, s in enumerate(student.subjects):
+        if s.subject_id == subject_id:
+            del student.subjects[idx]
+            self.db.update_student(student)
+            print("Success: Subject removed.")
+            return
+    print("Error: Subject not found.")
+```
+
+- What/importance
+  - Subject creation encapsulates ID, mark, and grade generation.
+  - Enroll enforces max-4, non-empty, and no-duplicate name rules.
+  - Remove operates by subject ID with clear messaging.
+  - View prints marks/grades and average, signaling pass/fail.
+
+- How it fits overall
+  - Provides core academic actions post-login; updates stored data for admin analytics.
+
+- Present like this
+  - Show `calculate_grade` → `Subject.create` → `student_enroll_subject` path.
+  - Demo hitting the max-4 rule and duplicate name prevention.
+
+- Tasks/contributions
+  - Subject model + random marks/grades
+  - Enroll/remove logic + validations
+  - Average and pass/fail reporting
+
+- Tips
+  - Tie each validation to a specific user error message for clarity.
+
+
+### Member 3 – Admin system: listing, grouping, partitioning, removal, data management
+
+- Key snippets
+
+```276:301:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def menu_admin(self) -> None:
+    print("1. List Students")
+    print("2. Remove Student")
+    print("3. Group Students by Grade")
+    print("4. Partition Students by Pass/Fail")
+    print("5. Clear All Student Data")
+```
+
+```451:463:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def admin_list_students(self) -> None:
+    students = self.db.list_students()
+    for s in students:
+        avg = s.average_mark()
+        status = "PASS" if s.is_passing() else "FAIL"
+        print(f"{s.student_id} | {s.first_name} {s.last_name} | {s.email} | Subjects: {len(s.subjects)} | Avg: {avg:.2f} ({status})")
+```
+
+```473:497:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def admin_group_by_grade(self) -> None:
+    students = self.db.list_students()
+    grade_order = {"HD": 4, "D": 3, "C": 2, "P": 1, "F": 0}
+    groups: Dict[str, List[Student]] = {"HD": [], "D": [], "C": [], "P": [], "F": [], "N/A": []}
+    for s in students:
+        if not s.subjects:
+            groups["N/A"].append(s); continue
+        best = max((subj.grade for subj in s.subjects), key=lambda g: grade_order.get(g, -1))
+        groups[best].append(s)
+    for grade, members in groups.items():
+        print(f"Grade {grade}:"); ...
+```
+
+```499:521:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def admin_partition_pass_fail(self) -> None:
+    students = self.db.list_students()
+    passed = [s for s in students if s.is_passing()]
+    failed = [s for s in students if not s.is_passing()]
+    print("PASS:"); ...
+    print("FAIL:"); ...
+```
+
+```465:471:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def admin_remove_student(self) -> None:
+    student_id = input("Enter Student ID to remove: ").strip()
+    ok, msg = self.db.remove_student(student_id)
+    print(msg)
+```
+
+```223:225:/Users/pranavsingh/Desktop/CLIUniApp/cliuniapp.py
+def clear_all(self) -> None:
+    self._write_all([])
+```
+
+- What/importance
+  - Admin insights: lists, groups by best grade, partitions by average pass/fail.
+  - Data management: targeted removal and full reset.
+
+- How it fits overall
+  - Uses persisted data created by student actions; supports instructor/admin oversight.
+
+- Present like this
+  - Show grouping logic (dominant grade) and partitioning by average; explain “N/A” for no-subject cases.
+
+- Tasks/contributions
+  - Admin menu and reporting functions
+  - Removal/clear operations in DB
+  - Cohesive analytics on student performance
+
+- Tips
+  - Highlight safety checks and clear outputs that match assignment formatting.
+
+
+### Member 4 – GUI application: login, student menu, enrollment UI/navigation, error handling
+
+- Key snippets
+
+```51:71:/Users/pranavsingh/Desktop/CLIUniApp/guiuniapp.py
+def _build_login(self) -> None:
+    ...
+    self.entry_email = tk.Entry(frame)
+    self.entry_password = tk.Entry(frame, show="*")
+    btn_login = tk.Button(frame, text="Login", command=self._on_login)
+    btn_register = tk.Button(frame, text="Register", command=self.show_register)
+    btn_exit = tk.Button(frame, text="Exit", command=self.destroy)
+```
+
+```94:121:/Users/pranavsingh/Desktop/CLIUniApp/guiuniapp.py
+def _build_enrollment(self) -> None:
+    self.lbl_enroll_title = tk.Label(..., text="Enrollment", ...)
+    self.lbl_student_info = tk.Label(..., text="")
+    self.btn_enroll = tk.Button(..., text="Enroll", command=self._on_enroll)
+    self.btn_view_subjects = tk.Button(..., text="View Subjects", command=self._show_subjects_window)
+    self.btn_enroll_form = tk.Button(..., text="Enroll (Form)", command=self.show_enroll_form)
+    self.btn_remove_subject = tk.Button(..., text="Remove Subject", command=self.show_remove_subject)
+    self.btn_change_password = tk.Button(..., text="Change Password", command=self.show_change_password)
+    self.btn_logout = tk.Button(..., text="Logout", command=self._logout)
+```
+
+```124:138:/Users/pranavsingh/Desktop/CLIUniApp/guiuniapp.py
+def _build_subjects_view(self) -> None:
+    lbl = tk.Label(..., text="Subjects", ...)
+    header = tk.Frame(frame); tk.Label(header, text="Subject"); tk.Label(header, text="Mark"); tk.Label(header, text="Grade")
+    self.subjects_holder = tk.Frame(frame)
+    btn_back = tk.Button(frame, text="Back", command=self.show_enrollment)
+```
+
+```192:203:/Users/pranavsingh/Desktop/CLIUniApp/guiuniapp.py
+def show_enrollment(self, student=None) -> None:
+    ...
+    if self.current_student is not None:
+        self.lbl_enroll_title.config(text=f"Enrollment - {self.current_student.first_name} ... ({self.current_student.student_id})")
+    self._refresh_enrollment_buttons()
+    self._refresh_student_info()
+```
+
+```244:259:/Users/pranavsingh/Desktop/CLIUniApp/guiuniapp.py
+def _on_login(self) -> None:
+    email = self.entry_email.get().strip().lower()
+    password = self.entry_password.get().strip()
+    if not email or not password: messagebox.showerror("Login Error", ...)
+    if not validate_email(email) or not validate_password(password): ...
+    student = self.db.get_student_by_email(email)
+    if student is None or student.password != password: ...
+    self.current_student = student
+    self.show_enrollment(student)
+```
+
+```289:311:/Users/pranavsingh/Desktop/CLIUniApp/guiuniapp.py
+def _on_enroll(self) -> None:
+    fresh = self.db.get_student_by_id(self.current_student.student_id)
+    if len(self.current_student.subjects) >= 4: messagebox.showerror("Enroll Error", ...)
+    new_subject = Subject.create(name=f"Subject {len(self.current_student.subjects)+1}", ...)
+    self.current_student.subjects.append(new_subject)
+    self.db.update_student(self.current_student)
+    messagebox.showinfo("Enroll", f"Enrolled in {new_subject.name} ...")
+    self._refresh_enrollment_buttons(); self._refresh_student_info()
+```
+
+```312:340:/Users/pranavsingh/Desktop/CLIUniApp/guiuniapp.py
+def _on_enroll_form(self) -> None:
+    name = self.entry_subject_name.get().strip()
+    if not name: messagebox.showerror("Enroll Error", "Subject name cannot be empty.")
+    if len(self.current_student.subjects) >= 4: ...
+    if any(s.name.lower() == name.lower() for s in self.current_student.subjects): ...
+    new_subject = Subject.create(name=name, ...)
+    self.current_student.subjects.append(new_subject)
+    self.db.update_student(self.current_student)
+    messagebox.showinfo("Enroll", f"Enrolled in {name} ...")
+    self.show_enrollment(); self._refresh_enrollment_buttons(); self._refresh_student_info()
+```
+
+- What/importance
+  - Full student GUI with login, registration, enrollment (quick and form), subjects, remove, change password, logout.
+  - Error handling via `messagebox.showerror`; dynamic button states enforcing rules.
+  - Reuses CLI validators and database to keep behavior identical.
+
+- How it fits overall
+  - Mirrors CLI flows with a user-friendly interface; reads/writes the same `students.data`.
+
+- Present like this
+  - Walk through login → main menu → two enrollment paths → view/remove → change password.
+  - Show how UI updates after actions via `_refresh_enrollment_buttons` and `_refresh_student_info`.
+
+- Tasks/contributions
+  - Tkinter windows and navigation
+  - Event-driven handlers
+  - Error dialogs and state refresh
+  - Test hooks for automation
+
+- Tips
+  - Emphasize reuse of CLI rules for consistency; point to where success/error dialogs are triggered.
+
+
+### General tips for all members
+- Start with the problem the snippet solves; then show the 2–3 lines that matter.
+- Connect code to user-visible behavior (e.g., “this error message appears when…”).
+- Keep each segment under 2 minutes; demo quickly if possible.
+- If asked “why this design?”, cite modularity, reuse, and persistence consistency.
