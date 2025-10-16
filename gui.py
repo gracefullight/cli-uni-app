@@ -30,7 +30,7 @@ class App:
         self.current_student: Optional[Student] = None
         self._container = tk.Frame(self.root)
         self._container.pack(fill=tk.BOTH, expand=True)
-        self._frames = {}
+        self._frames: dict[str, tk.Frame] = {}
         self._build_login()
         self._build_register()
         self._build_enrollment()
@@ -339,7 +339,8 @@ class App:
         if self.current_student is None:
             messagebox.showerror("Remove Error", "No student logged in.")
             return
-        subject_id = getattr(self, "remove_choice", None).get() if hasattr(self, "remove_choice") else ""
+        remove_choice = getattr(self, "remove_choice", None)
+        subject_id = remove_choice.get() if remove_choice is not None else ""
         if not subject_id:
             messagebox.showerror("Remove Error", "Please select a subject to remove.")
             return
