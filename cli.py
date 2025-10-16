@@ -34,7 +34,7 @@ class CLI:
             # Print header in cyan using rich
             console.print("The University System", style="cyan")
             # Prompt format: University System: (A)dmin, (S)tudent, or X : 
-            choice = console.input("[cyan]University System: (A)dmin, (S)tudent, or X : [/]").strip().lower()
+            choice = console.input("[cyan]University System: (A)dmin, (S)tudent, or [X] : [/]").strip().lower()
             if choice == "a":
                 self.menu_admin()
             elif choice == "s":
@@ -68,7 +68,8 @@ class CLI:
         clear_screen()
         # Admin system prompt (c/g/p/r/s/x)
         while True:
-            admin_choice = console.input("[cyan]Admin System (c/g/p/r/s/x): [/]").strip().lower()
+            console.print("Admin System:", style="cyan")
+            admin_choice = console.input("[cyan][C]lear Database, [G]roup Students, [P]artition Students, [R]emove Student, [S]how Students or [X]: [/]").strip().lower()
             if admin_choice == "c":
                 # Clear all student data
                 self.admin_clear_all()
@@ -89,7 +90,7 @@ class CLI:
     def menu_subject_enrollment(self, student: Student) -> None:
         while True:
             console.print(f"Student Course Menu ({student.first_name} {student.last_name} | ID: {student.student_id})", style="cyan")
-            console.print("[C]hange Password, [E]nroll Subject, [R]emove Subject, [S]how Enrollment, or X", style="cyan")
+            console.print("[C]hange Password, [E]nroll Subject, [R]emove Subject, [S]how Enrollment, or [X]", style="cyan")
             choice = console.input("Select an option: ").strip().lower()
             if choice == "c":
                 self.student_change_password(student)
@@ -165,20 +166,20 @@ class CLI:
 
     def student_view_enrollment(self, student: Student) -> None:
         clear_screen()
-        print("------ Your Enrollment ------")
+        console.print(f"Showing {len(student.subjects)} subjects", style="yellow")
         if not student.subjects:
-            print("No subjects enrolled.")
+            console.print("No subjects enrolled.")
         else:
             for s in student.subjects:
-                print(f"[{s.subject_id}] {s.name} - Mark: {s.mark}, Grade: {s.grade}")
+                console.print(f"[{s.subject_id}] {s.name} - Mark: {s.mark}, Grade: {s.grade}")
             avg = student.average_mark()
             status = "PASS" if student.is_passing() else "FAIL"
-            print(f"Average: {avg:.2f} ({status})")
+            console.print(f"Average: {avg:.2f} ({status})")
         pause()
 
     def student_enroll_subject(self, student: Student) -> None:
         clear_screen()
-        print("------ Enroll in Subject ------")
+        console.print("------ Enroll in Subject ------", style="yellow")
         if len(student.subjects) >= MAX_SUBJECTS_PER_STUDENT:
             console.print(f"Error: Subject limit reached ({MAX_SUBJECTS_PER_STUDENT}).", style="red")
             pause()
@@ -197,25 +198,25 @@ class CLI:
         subject = Subject.create(name=name, existing_ids=existing_ids)
         student.subjects.append(subject)
         self.db.update_student(student)
-        print(f"Success: Enrolled in {subject.name} with Subject ID {subject.subject_id}. Mark: {subject.mark}, Grade: {subject.grade}")
+        console.print(f"Success: Enrolled in {subject.name} with Subject ID {subject.subject_id}. Mark: {subject.mark}, Grade: {subject.grade}")
+        console.print(f"You are now enrolled in {len(student.subjects)} out of {MAX_SUBJECTS_PER_STUDENT} subjects.", style="yellow")
         pause()
 
     def student_remove_subject(self, student: Student) -> None:
         clear_screen()
-        print("------ Remove Subject ------")
         if not student.subjects:
-            print("No subjects to remove.")
+            console.print("No subjects to remove.", style="red")
             pause()
             return
         for s in student.subjects:
-            print(f"[{s.subject_id}] {s.name}")
-        subject_id = input("Enter Subject ID to remove: ").strip()
+            console.print(f"[{s.subject_id}] {s.name}")
+        subject_id = console.input("Enter Subject ID to remove: ").strip()
         for idx, s in enumerate(student.subjects):
             if s.subject_id == subject_id:
+                console.print(f"Dropping subject {s.subject_id}", style="yellow")
                 del student.subjects[idx]
                 self.db.update_student(student)
-                print("Success: Subject removed.")
-                pause()
+                console.print(f"You are now enrolled in {len(student.subjects)} out of {MAX_SUBJECTS_PER_STUDENT} subjects.", style="yellow")
                 return
         console.print("Error: Subject not found.", style="red")
         pause()
@@ -230,7 +231,7 @@ class CLI:
             return
         confirm_password = console.input("Confirm password: ", password=True).strip()
         if new_password != confirm_password:
-            console.print("Error: Passwords do not match.", style="red")
+            console.print("Error: Password does not match.", style="red")
             return
 
         student.password = hash_password(new_password)
@@ -241,12 +242,13 @@ class CLI:
     # ------------------------- Admin Flows -------------------------
     def admin_list_students(self) -> None:
         clear_screen()
-        print("------ All Students ------")
+        console.print("Student List", style="yellow")
         students = self.db.list_students()
         if not students:
-            print("No students found.")
+            console.print("No students found.", style="red")
             pause()
             return
+
         for s in students:
             avg = s.average_mark()
             status = "PASS" if s.is_passing() else "FAIL"
@@ -255,8 +257,8 @@ class CLI:
 
     def admin_remove_student(self) -> None:
         clear_screen()
-        print("------ Remove Student ------")
-        student_id = input("Enter Student ID to remove: ").strip()
+        console.print("Remove Student", style="red")
+        student_id = console.input("Enter Student ID to remove: ").strip()
         ok, msg = self.db.remove_student(student_id)
         if isinstance(msg, str) and msg.startswith("Error"):
             console.print(msg, style="red")
@@ -266,10 +268,10 @@ class CLI:
 
     def admin_group_by_grade(self) -> None:
         clear_screen()
-        print("------ Group Students by Grade ------")
+        console.print("Grade Grouping", style="yellow")
         students = self.db.list_students()
         if not students:
-            print("No students to group.")
+            console.print("<Nothing to Display>")
             pause()
             return
         # Determine dominant grade per student as the highest grade across subjects; if no subjects, 'N/A'
@@ -282,9 +284,9 @@ class CLI:
             best = max((subj.grade for subj in s.subjects), key=lambda g: grade_order.get(g, -1))
             groups[best].append(s)
         for grade, members in groups.items():
-            print(f"Grade {grade}:")
+            console.print(f"Grade {grade}:", style="yellow")
             if not members:
-                print("  (none)")
+                console.print("<Nothing to Display>")
             else:
                 for m in members:
                     print(f"  {m.student_id} | {m.first_name} {m.last_name} | Avg {m.average_mark():.2f}")
@@ -292,35 +294,35 @@ class CLI:
 
     def admin_partition_pass_fail(self) -> None:
         clear_screen()
-        print("------ Partition Students by Pass/Fail ------")
+        console.print("PASS/FAIL Partition", style="yellow")
         students = self.db.list_students()
         if not students:
-            print("No students to partition.")
+            console.print("No students to partition.", style="red")
             pause()
             return
         passed = [s for s in students if s.is_passing()]
         failed = [s for s in students if not s.is_passing()]
-        print("PASS:")
+        console.print("PASS:", style="green")
         if not passed:
-            print("  (none)")
+            console.print("<Nothing to Display>")
         else:
             for s in passed:
-                print(f"  {s.student_id} | {s.first_name} {s.last_name} | Avg {s.average_mark():.2f}")
-        print("FAIL:")
+                console.print(f"  {s.student_id} | {s.first_name} {s.last_name} | Avg {s.average_mark():.2f}")
+        console.print("FAIL:", style="red")
         if not failed:
-            print("  (none)")
+            console.print("<Nothing to Display>")
         else:
             for s in failed:
-                print(f"  {s.student_id} | {s.first_name} {s.last_name} | Avg {s.average_mark():.2f}")
+                console.print(f"  {s.student_id} | {s.first_name} {s.last_name} | Avg {s.average_mark():.2f}")
         pause()
 
     def admin_clear_all(self) -> None:
         clear_screen()
-        print("------ Clear All Student Data ------")
-        confirm = input("Type 'CONFIRM' to permanently delete all student data: ").strip()
-        if confirm == "CONFIRM":
+        console.print("Clearing students database", style="red")
+        confirm = console.input("[red]Are you sure you want to clear the database (Y)ES/(N)O?: [/]").strip().upper()
+        if confirm == "Y":
             self.db.clear_all()
-            print("Success: All student data cleared.")
+            console.print("Success: All student data cleared.", style="yellow")
         else:
             console.print("Operation cancelled.", style="red")
         pause()
