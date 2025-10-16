@@ -4,7 +4,6 @@ import random
 from dataclasses import dataclass, asdict
 from typing import Dict
 
-from constants import SUBJECT_ID_LENGTH
 from utils.id_generator import generate_unique_id
 from utils.grade_calculator import calculate_grade
 
@@ -22,7 +21,7 @@ class Subject:
     @staticmethod
     def generate_id(existing_ids: set[str]) -> str:
         """Generate a unique numeric string ID of given length not present in existing_ids."""
-        return generate_unique_id(existing_ids, SUBJECT_ID_LENGTH)
+        return generate_unique_id(existing_ids, 3)
 
     @staticmethod
     def create(name: str, existing_ids: set[str]) -> "Subject":

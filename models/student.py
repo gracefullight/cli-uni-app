@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List
 
 from .subject import Subject
-from constants import PASSING_AVERAGE, STUDENT_ID_LENGTH
+from constants import PASSING_AVERAGE
 from utils.id_generator import generate_unique_id
 
 
@@ -33,7 +33,7 @@ class Student:
     @staticmethod
     def generate_id(existing_ids: set[str]) -> str:
         """Generate a unique numeric string ID of given length not present in existing_ids."""
-        return generate_unique_id(existing_ids, STUDENT_ID_LENGTH)
+        return generate_unique_id(existing_ids, 6)
 
     @staticmethod
     def from_dict(data: Dict) -> "Student":

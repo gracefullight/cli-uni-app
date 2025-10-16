@@ -6,8 +6,6 @@ Configuration constants for CLIUniApp.
 MAX_SUBJECTS_PER_STUDENT = 4
 PASSING_AVERAGE = 50
 DATA_FILE = "students.data"
-STUDENT_ID_LENGTH = 6
-SUBJECT_ID_LENGTH = 3
 MAX_LOGIN_ATTEMPTS = 3
 
 
