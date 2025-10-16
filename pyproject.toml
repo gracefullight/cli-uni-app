@@ -9,6 +9,7 @@ authors = [
 ]
 dependencies = [
     "bcrypt",
+    "customtkinter>=5.2.2",
     "rich",
 ]
 

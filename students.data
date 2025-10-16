@@ -7,10 +7,16 @@
     "password": "$2b$12$Cu.1WiT8q4JWSIcMqkCtI.iJjn81Oo3cTCZ81/rndBpoPkXioKh3K",
     "subjects": [
       {
-        "subject_id": "934",
-        "name": "aaa",
-        "mark": 93,
-        "grade": "HD"
+        "subject_id": "475",
+        "name": "Subject 1",
+        "mark": 15,
+        "grade": "F"
+      },
+      {
+        "subject_id": "151",
+        "name": "Subject 2",
+        "mark": 14,
+        "grade": "F"
       }
     ]
   }
