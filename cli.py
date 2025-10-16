@@ -140,7 +140,7 @@ class CliApp:
         if isinstance(msg, str) and msg.startswith("Error"):
             console.print(msg, style=Colors.ERROR)
         else:
-            print(msg)
+            console.print(msg)
         
 
     def student_login(self) -> Optional[Student]:
@@ -187,7 +187,7 @@ class CliApp:
         if len(student.subjects) >= MAX_SUBJECTS_PER_STUDENT:
             console.print(ErrorMessages.SUBJECT_LIMIT_REACHED.format(max_subjects=MAX_SUBJECTS_PER_STUDENT), style=Colors.ERROR)
             return
-        name = input(Prompts.SUBJECT_NAME).strip()
+        name = console.input(Prompts.SUBJECT_NAME).strip()
         if not name:
             console.print(ErrorMessages.SUBJECT_NAME_EMPTY, style=Colors.ERROR)
             return
@@ -259,7 +259,7 @@ class CliApp:
         for s in students:
             avg = s.average_mark()
             status = InfoMessages.STATUS_PASS if s.is_passing() else InfoMessages.STATUS_FAIL
-            print(FormatTemplates.STUDENT_DETAIL.format(
+            console.print(FormatTemplates.STUDENT_DETAIL.format(
                 student_id=s.student_id,
                 first_name=s.first_name,
                 last_name=s.last_name,
@@ -278,7 +278,7 @@ class CliApp:
         if isinstance(msg, str) and msg.startswith("Error"):
             console.print(msg, style=Colors.ERROR)
         else:
-            print(msg)
+            console.print(msg)
         
 
     def admin_group_by_grade(self) -> None:
@@ -293,7 +293,6 @@ class CliApp:
         
         for s in students:
             if not s.subjects:
-                groups[Grades.NA].append(s)
                 continue
             best = max((subj.grade for subj in s.subjects), key=lambda g: Grades.ORDER.get(g, -1))
             groups[best].append(s)
@@ -304,7 +303,7 @@ class CliApp:
                 console.print(InfoMessages.NOTHING_TO_DISPLAY)
             else:
                 for m in members:
-                    print(FormatTemplates.STUDENT_SUMMARY.format(
+                    console.print(FormatTemplates.STUDENT_SUMMARY.format(
                         student_id=m.student_id,
                         first_name=m.first_name,
                         last_name=m.last_name,

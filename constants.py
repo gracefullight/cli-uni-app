@@ -20,7 +20,6 @@ class Grades:
     C = "C"    # Credit (65-74)
     P = "P"    # Pass (50-64)
     F = "F"    # Fail (0-49)
-    NA = "N/A" # No subjects
     
     # Grade thresholds
     THRESHOLDS = {
@@ -35,5 +34,5 @@ class Grades:
     ORDER = {HD: 4, D: 3, C: 2, P: 1, F: 0}
     
     # All grade categories
-    ALL = [HD, D, C, P, F, NA]
+    ALL = [HD, D, C, P, F]
 
