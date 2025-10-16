@@ -7,4 +7,11 @@ requires-python = ">=3.10"
 authors = [
     {name = "Group Members"},
 ]
-dependencies = []
+dependencies = [
+    "bcrypt",
+    "rich",
+]
+
+[project.scripts]
+cliuniapp = "cli:main"
+guiuniapp = "gui:main"

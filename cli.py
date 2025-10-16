@@ -19,25 +19,21 @@ from __future__ import annotations
 import json
 import os
 import random
-import re
 from dataclasses import dataclass, asdict, field
 from typing import Dict, List, Optional, Tuple
+
+from rich.console import Console
+
+from utils.cmd import clear_screen, pause
+from utils.password import validate_email, validate_password, hash_password, check_password
+
+# rich console for colored output
+console = Console()
 
 
 DATA_FILE = "students.data"
 MAX_SUBJECTS_PER_STUDENT = 4
 PASSING_AVERAGE = 50
-
-
-def clear_screen() -> None:
-    """Clear terminal screen in a cross-platform manner."""
-    os.system("cls" if os.name == "nt" else "clear")
-
-
-def pause(msg: str = "Press Enter to continue...") -> None:
-    """Pause execution awaiting user to press Enter."""
-    input(msg)
-
 
 def generate_unique_id(existing_ids: set[str], length: int) -> str:
     """Generate a unique numeric string ID of given length not present in existing_ids."""
@@ -47,24 +43,6 @@ def generate_unique_id(existing_ids: set[str], length: int) -> str:
         candidate = str(random.randint(lower, upper))
         if candidate not in existing_ids:
             return candidate
-
-
-def validate_email(email: str) -> bool:
-    """Validate email format: firstname.lastname@university.com"""
-    pattern = r"^[a-z]+\.[a-z]+@university\.com$"
-    return re.match(pattern, email) is not None
-
-
-def validate_password(password: str) -> bool:
-    """Validate password: starts with uppercase, 5+ letters total, ending with 3 digits.
-
-    Examples of valid: Abcde123, Password999
-    Must start with [A-Z], include at least 5 letters (letters means alphabetic characters), and end with exactly 3 digits.
-    """
-    # Starts with uppercase letter, followed by at least 4 letters (upper/lower), and end with exactly 3 digits
-    pattern = r"^[A-Z][A-Za-z]{4,}\d{3}$"
-    return re.match(pattern, password) is not None
-
 
 def calculate_grade(mark: int) -> str:
     """Return grade string based on mark."""
@@ -77,7 +55,6 @@ def calculate_grade(mark: int) -> str:
     if mark >= 50:
         return "P"   # Pass
     return "F"       # Fail
-
 
 @dataclass
 class Subject:
@@ -197,7 +174,8 @@ class Database:
             return False, "Error: Email already registered.", None
         existing_ids = {s.student_id for s in students}
         student_id = generate_unique_id(existing_ids, 6)
-        new_student = Student(student_id=student_id, first_name=first_name, last_name=last_name, email=email, password=password, subjects=[])
+        hashed_password = hash_password(password)
+        new_student = Student(student_id=student_id, first_name=first_name, last_name=last_name, email=email, password=hashed_password, subjects=[])
         students.append(new_student)
         self._write_all(students)
         return True, f"Success: Student registered with ID {student_id}.", new_student
@@ -224,7 +202,6 @@ class Database:
     def clear_all(self) -> None:
         self._write_all([])
 
-
 class CLI:
     """Main CLI controller for menus and user interaction."""
 
@@ -235,22 +212,54 @@ class CLI:
     def run(self) -> None:
         while True:
             clear_screen()
-            print("==============================")
-            print("      University System")
-            print("==============================")
-            print("1. Student")
-            print("2. Admin")
-            print("3. Exit")
-            choice = input("Select an option: ").strip()
-            if choice == "1":
-                self.menu_student()
-            elif choice == "2":
-                self.menu_admin()
-            elif choice == "3":
-                print("Exiting... Goodbye!")
-                break
+            # Print header in cyan using rich
+            console.print("The University System", style="cyan")
+            # Prompt format: University System: (A)dmin, (S)tudent, or X : 
+            choice = console.input("[cyan]University System: (A)dmin, (S)tudent, or X : [/]").strip().lower()
+            if choice == "a":
+                # Admin system prompt (c/g/p/r/s/x)
+                while True:
+                    admin_choice = console.input("[cyan]Admin System (c/g/p/r/s/x): [/]").strip().lower()
+                    if admin_choice == "c":
+                        # Clear all student data
+                        self.admin_clear_all()
+                    elif admin_choice == "g":
+                        self.admin_group_by_grade()
+                    elif admin_choice == "p":
+                        self.admin_partition_pass_fail()
+                    elif admin_choice == "r":
+                        self.admin_remove_student()
+                    elif admin_choice == "s":
+                        self.admin_list_students()
+                    elif admin_choice == "x":
+                        break
+                    else:
+                        console.print("Invalid admin option. Try again.", style="red")
+                        pause()
+            elif choice == "s":
+                # Student system prompt (l/r/z/x) - login/register/back/exit
+                while True:
+                    student_choice = console.input("[cyan]Student System (l/r/z/x): [/]").strip().lower()
+                    if student_choice == "l":
+                        student = self.student_login()
+                        if student:
+                            self.menu_subject_enrollment(student)
+                    elif student_choice == "r":
+                        self.student_register()
+                    elif student_choice == "z":
+                        # 'z' used as Back in screenshot (maps to returning to main prompt)
+                        break
+                    elif student_choice == "x":
+                        print("Thank You")
+                        return
+                    else:
+                        console.print("Invalid student option. Try again.", style="red")
+                        pause()
+            elif choice == "x":
+                console.print("Thank You", style="yellow")
+                return
             else:
-                print("Invalid option. Try again.")
+                console.print("Invalid option. Try again.", style="red")
                 pause()
 
     def menu_student(self) -> None:
@@ -270,7 +279,7 @@ class CLI:
             elif choice == "3":
                 return
             else:
-                print("Invalid option. Try again.")
+                console.print("Invalid option. Try again.", style="red")
                 pause()
 
     def menu_admin(self) -> None:
@@ -335,27 +344,30 @@ class CLI:
 
         # Validations
         if not validate_email(email):
-            print("Error: Invalid email format. Expected firstname.lastname@university.com")
+            console.print("Error: Invalid email format. Expected firstname.lastname@university.com", style="red")
             pause()
             return
         if not validate_password(password):
-            print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits")
+            console.print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits", style="red")
             pause()
             return
         # Enforce that email components match provided names
         try:
             fname_part, lname_part = email.split("@")[0].split(".")
         except ValueError:
-            print("Error: Invalid email format components.")
+            console.print("Error: Invalid email format components.", style="red")
             pause()
             return
         if fname_part != first_name.lower() or lname_part != last_name.lower():
-            print("Error: Email name parts must match first and last name provided.")
+            console.print("Error: Email name parts must match first and last name provided.", style="red")
             pause()
             return
 
         ok, msg, _student = self.db.add_student(first_name, last_name, email, password)
-        print(msg)
+        if isinstance(msg, str) and msg.startswith("Error"):
+            console.print(msg, style="red")
+        else:
+            print(msg)
         pause()
 
     def student_login(self) -> Optional[Student]:
@@ -364,8 +376,8 @@ class CLI:
         email = input("Email: ").strip().lower()
         password = input("Password: ").strip()
         student = self.db.get_student_by_email(email)
-        if not student or student.password != password:
-            print("Error: Invalid email or password.")
+        if not student or not check_password(password, student.password):
+            console.print("Error: Invalid email or password.", style="red")
             pause()
             return None
         print(f"Welcome, {student.first_name}!")
@@ -389,17 +401,17 @@ class CLI:
         clear_screen()
         print("------ Enroll in Subject ------")
         if len(student.subjects) >= MAX_SUBJECTS_PER_STUDENT:
-            print(f"Error: Subject limit reached ({MAX_SUBJECTS_PER_STUDENT}).")
+            console.print(f"Error: Subject limit reached ({MAX_SUBJECTS_PER_STUDENT}).", style="red")
             pause()
             return
         name = input("Subject name: ").strip()
         if not name:
-            print("Error: Subject name cannot be empty.")
+            console.print("Error: Subject name cannot be empty.", style="red")
             pause()
             return
         # Prevent duplicate subject names for the same student
         if any(s.name.lower() == name.lower() for s in student.subjects):
-            print("Error: Already enrolled in a subject with this name.")
+            console.print("Error: Already enrolled in a subject with this name.", style="red")
             pause()
             return
         existing_ids = {s.subject_id for s in student.subjects}
@@ -426,23 +438,23 @@ class CLI:
                 print("Success: Subject removed.")
                 pause()
                 return
-        print("Error: Subject not found.")
+        console.print("Error: Subject not found.", style="red")
         pause()
 
     def student_change_password(self, student: Student) -> None:
         clear_screen()
         print("------ Change Password ------")
         old = input("Current password: ").strip()
-        if old != student.password:
-            print("Error: Current password incorrect.")
+        if not check_password(old, student.password):
+            console.print("Error: Current password incorrect.", style="red")
             pause()
             return
         new = input("New password: ").strip()
         if not validate_password(new):
-            print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits")
+            console.print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits", style="red")
             pause()
             return
-        student.password = new
+        student.password = hash_password(new)
         self.db.update_student(student)
         print("Success: Password changed.")
         pause()
@@ -467,7 +479,10 @@ class CLI:
         print("------ Remove Student ------")
         student_id = input("Enter Student ID to remove: ").strip()
         ok, msg = self.db.remove_student(student_id)
-        print(msg)
+        if isinstance(msg, str) and msg.startswith("Error"):
+            console.print(msg, style="red")
+        else:
+            print(msg)
         pause()
 
     def admin_group_by_grade(self) -> None:
@@ -528,7 +543,7 @@ class CLI:
             self.db.clear_all()
             print("Success: All student data cleared.")
         else:
-            print("Operation cancelled.")
+            console.print("Operation cancelled.", style="red")
         pause()
 
 

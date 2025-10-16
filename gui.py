@@ -19,10 +19,9 @@ from tkinter import messagebox
 from cli import (
     Database,
     Subject,
-    validate_email,
-    validate_password,
     DATA_FILE,
 )
+from utils.password import validate_email, validate_password, hash_password, check_password
 
 
 class App:
@@ -251,7 +250,7 @@ class App:
             messagebox.showerror("Login Error", "Invalid email or password format.")
             return
         student = self.db.get_student_by_email(email)
-        if student is None or student.password != password:
+        if student is None or not check_password(password, student.password):
             messagebox.showerror("Login Error", "Invalid credentials or unregistered user.")
             return
         self.current_student = student
@@ -374,13 +373,13 @@ class App:
         if fresh is None:
             messagebox.showerror("Password Error", "Student not found.")
             return
-        if current != fresh.password:
+        if not check_password(current, fresh.password):
             messagebox.showerror("Password Error", "Current password incorrect.")
             return
         if not validate_password(new):
             messagebox.showerror("Password Error", "Invalid password format.")
             return
-        fresh.password = new
+        fresh.password = hash_password(new)
         self.db.update_student(fresh)
         self.current_student = fresh
         messagebox.showinfo("Password", "Password changed successfully.")
@@ -440,8 +439,17 @@ def launch_app() -> App:
     return App()
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Launch the GUI application and start the Tk main loop.
+
+    This wrapper is used as a console script entry point so the GUI can be
+    started with a simple command (e.g. `guiuniapp`).
+    """
     app = launch_app()
     app.root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
 
 
