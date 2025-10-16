@@ -2,19 +2,17 @@
 
 from typing import Optional, Tuple
 
-from constants import MAX_SUBJECTS_PER_STUDENT
-from utils.password import validate_email, validate_password, hash_password, check_password
 from models.student import Student
 from models.subject import Subject
-from db import Database
+from services.student_service import StudentService
 
 
 # Person D: GUI Interface
 class GUIStudentController:
     """Controller for GUI student operations."""
 
-    def __init__(self, db: Database) -> None:
-        self.db = db
+    def __init__(self, student_service: StudentService) -> None:
+        self.student_service = student_service
 
     def login(self, email: str, password: str) -> Optional[Student]:
         """
@@ -25,17 +23,7 @@ class GUIStudentController:
         Raises:
             ValueError with error message if validation fails
         """
-        if not email or not password:
-            raise ValueError("Email and password are required")
-        
-        if not validate_email(email) or not validate_password(password):
-            raise ValueError("Invalid email or password format")
-        
-        student = self.db.get_student_by_email(email.lower())
-        if student is None or not check_password(password, student.password):
-            raise ValueError("Invalid email or password")
-        
-        return student
+        return self.student_service.login(email, password)
 
     def enroll_subject(self, student: Student) -> Tuple[Student, Subject]:
         """
@@ -46,21 +34,7 @@ class GUIStudentController:
         Raises:
             ValueError with error message if enrollment fails
         """
-        # Refresh student data from database
-        fresh = self.db.get_student_by_id(student.student_id)
-        if fresh is None:
-            raise ValueError("Student not found in database")
-        
-        if len(fresh.subjects) >= MAX_SUBJECTS_PER_STUDENT:
-            raise ValueError(f"Students are allowed to enroll in {MAX_SUBJECTS_PER_STUDENT} subjects only")
-        
-        existing_ids = {s.subject_id for s in fresh.subjects}
-        subject_name = f"Subject-{len(fresh.subjects) + 1}"
-        new_subject = Subject.create(name=subject_name, existing_ids=existing_ids)
-        fresh.subjects.append(new_subject)
-        
-        self.db.update_student(fresh)
-        return (fresh, new_subject)
+        return self.student_service.enroll_subject(student)
 
     def remove_subject(self, student: Student, subject_id: str) -> Student:
         """
@@ -71,25 +45,7 @@ class GUIStudentController:
         Raises:
             ValueError with error message if removal fails
         """
-        if not subject_id:
-            raise ValueError("Please select a subject to remove")
-        
-        fresh = self.db.get_student_by_id(student.student_id)
-        if fresh is None:
-            raise ValueError("Student not found in database")
-        
-        removed = False
-        for idx, s in enumerate(fresh.subjects):
-            if s.subject_id == subject_id:
-                del fresh.subjects[idx]
-                removed = True
-                break
-        
-        if not removed:
-            raise ValueError("Subject not found")
-        
-        self.db.update_student(fresh)
-        return fresh
+        return self.student_service.remove_subject(student, subject_id)
 
     def change_password(self, student: Student, new_password: str, confirm_password: str) -> Student:
         """
@@ -100,17 +56,4 @@ class GUIStudentController:
         Raises:
             ValueError with error message if password change fails
         """
-        if new_password != confirm_password:
-            raise ValueError("Passwords do not match")
-        
-        if not validate_password(new_password):
-            raise ValueError("Incorrect password format")
-        
-        fresh = self.db.get_student_by_id(student.student_id)
-        if fresh is None:
-            raise ValueError("Student not found in database")
-        
-        fresh.password = hash_password(new_password)
-        self.db.update_student(fresh)
-        
-        return fresh
+        return self.student_service.change_password(student, new_password, confirm_password)

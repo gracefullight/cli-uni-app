@@ -20,6 +20,8 @@ from messages import (
 from utils.cmd import clear_screen
 from controllers import StudentController, AdminController
 from db import Database
+from services.student_service import StudentService
+from services.admin_service import AdminService
 
 console = Console()
 
@@ -28,10 +30,9 @@ console = Console()
 class CliApp:
     """Main CLI application with menu navigation."""
 
-    def __init__(self, db: Database) -> None:
-        self.db = db
-        self.student_controller = StudentController(db)
-        self.admin_controller = AdminController(db)
+    def __init__(self, student_controller: StudentController, admin_controller: AdminController) -> None:
+        self.student_controller = student_controller
+        self.admin_controller = admin_controller
 
     # ------------------------- Menu Rendering -------------------------
     def run(self) -> None:
@@ -48,7 +49,6 @@ class CliApp:
                 return
             else:
                 console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
-                
 
     # Person C: CLI Interface
     def menu_student(self) -> None:
@@ -66,7 +66,6 @@ class CliApp:
                 break
             else:
                 console.print(ErrorMessages.INVALID_ADMIN_OPTION, style=Colors.ERROR)
-                
 
     # Person C: CLI Interface
     def menu_admin(self) -> None:
@@ -88,7 +87,6 @@ class CliApp:
                 break
             else:
                 console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
-                
 
     # Person C: CLI Interface
     def menu_subject_enrollment(self, student) -> None:
@@ -112,15 +110,16 @@ class CliApp:
                 return
             else:
                 console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
-                
 
 def main() -> None:
     db = Database()
-    cli = CliApp(db)
+    student_service = StudentService(db)
+    admin_service = AdminService(db)
+    student_controller = StudentController(student_service)
+    admin_controller = AdminController(admin_service)
+    cli = CliApp(student_controller, admin_controller)
     cli.run()
 
 
 if __name__ == "__main__":
     main()
-
-
