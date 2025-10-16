@@ -26,11 +26,13 @@ class App:
     def __init__(self) -> None:
         self.root = tk.Tk()
         self.root.title("GUIUniApp")
+        self.root.geometry("400x300")
         self.db = Database()
         self.current_student: Optional[Student] = None
         self._container = tk.Frame(self.root)
         self._container.pack(fill=tk.BOTH, expand=True)
         self._frames: dict[str, tk.Frame] = {}
+
         self._build_login()
         self._build_register()
         self._build_enrollment()
@@ -38,6 +40,7 @@ class App:
         self._build_enroll_form()
         self._build_remove_subject()
         self._build_change_password()
+
         self.show_login()
 
     # ---------------- UI construction ----------------
@@ -47,11 +50,14 @@ class App:
 
     def _build_login(self) -> None:
         frame = tk.Frame(self._container)
-        lbl_title = tk.Label(frame, text="Login", font=("Arial", 14, "bold"))
+        lbl_title = tk.Label(frame, text="Student Login", font=("Arial", 14, "bold"))
         lbl_email = tk.Label(frame, text="Email:")
         self.entry_email = tk.Entry(frame)
+        
+        self._bind_placeholder(self.entry_email, "Firstname.Lastname@university.com")
         lbl_pass = tk.Label(frame, text="Password:")
         self.entry_password = tk.Entry(frame, show="*")
+        
         btn_login = tk.Button(frame, text="Login", command=self._on_login)
         btn_register = tk.Button(frame, text="Register", command=self.show_register)
         btn_exit = tk.Button(frame, text="Exit", command=self.destroy)
@@ -178,6 +184,7 @@ class App:
     def show_login(self) -> None:
         self._clear_container()
         self._frames["login"].pack(fill=tk.BOTH, expand=True)
+        self.entry_email.focus()
 
     def show_register(self) -> None:
         self._clear_container()
@@ -409,6 +416,20 @@ class App:
         avg = (sum(s.mark for s in self.current_student.subjects) / count) if count else 0.0
         status = "PASS" if (avg >= 50 and count > 0) else ("N/A" if count == 0 else "FAIL")
         self.lbl_student_info.config(text=f"Subjects: {count} | Average: {avg:.2f} | Status: {status}")
+
+    def _bind_placeholder(self, entry: tk.Entry, placeholder: str) -> None:
+        entry.insert(0, placeholder)
+        entry.config(fg='grey')
+        def on_focus_in(event):
+            if entry.get() == placeholder:
+                entry.delete(0, tk.END)
+                entry.config(fg='black')
+        def on_focus_out(event):
+            if not entry.get():
+                entry.insert(0, placeholder)
+                entry.config(fg='grey')
+        entry.bind('<FocusIn>', on_focus_in)
+        entry.bind('<FocusOut>', on_focus_out)
 
     def destroy(self) -> None:
         try:
