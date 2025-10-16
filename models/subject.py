@@ -4,18 +4,20 @@ import random
 from dataclasses import dataclass, asdict
 from typing import Dict
 
+from constants import Grades
+
 
 def calculate_grade(mark: int) -> str:
     """Return grade string based on mark."""
-    if mark >= 85:
-        return "HD"  # High Distinction
-    if mark >= 75:
-        return "D"   # Distinction
-    if mark >= 65:
-        return "C"   # Credit
-    if mark >= 50:
-        return "P"   # Pass
-    return "F"       # Fail
+    if mark >= Grades.THRESHOLDS[Grades.HD]:
+        return Grades.HD
+    if mark >= Grades.THRESHOLDS[Grades.D]:
+        return Grades.D
+    if mark >= Grades.THRESHOLDS[Grades.C]:
+        return Grades.C
+    if mark >= Grades.THRESHOLDS[Grades.P]:
+        return Grades.P
+    return Grades.F
 
 
 @dataclass

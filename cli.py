@@ -10,16 +10,23 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 from rich.console import Console
+
+from constants import MAX_SUBJECTS_PER_STUDENT, MAX_LOGIN_ATTEMPTS, Grades
+from messages import (
+    Prompts,
+    SuccessMessages,
+    ErrorMessages,
+    InfoMessages,
+    FormatTemplates,
+    Colors,
+)
 from utils.cmd import clear_screen
 from utils.password import validate_email, validate_password, hash_password, check_password
 from models.student import Student
 from models.subject import Subject
 from db import Database
 
-# rich console for colored output
 console = Console()
-
-MAX_SUBJECTS_PER_STUDENT = 4
 
 class CliApp:
     """Main CLI controller for menus and user interaction."""
@@ -31,47 +38,42 @@ class CliApp:
     def run(self) -> None:
         while True:
             clear_screen()
-            # Print header in cyan using rich
-            console.print("The University System", style="cyan")
-            # Prompt format: University System: (A)dmin, (S)tudent, or X : 
-            choice = console.input("[cyan]University System: (A)dmin, (S)tudent, or [X] : [/]").strip().lower()
+            console.print(InfoMessages.UNIVERSITY_SYSTEM, style=Colors.HEADER)
+            choice = console.input(f"[{Colors.HEADER}]{Prompts.UNIVERSITY}[/]").strip().lower()
             if choice == "a":
                 self.menu_admin()
             elif choice == "s":
                 self.menu_student()
             elif choice == "x":
-                console.print("Thank You", style="yellow")
+                console.print(InfoMessages.THANK_YOU, style=Colors.WARNING)
                 return
             else:
-                console.print("Invalid option. Try again.", style="red")
+                console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
                 
 
     def menu_student(self) -> None:
-        # Student system prompt (l/r/x) - login/register/back
         while True:
-            student_choice = console.input("[cyan]Student System: [L]ogin, [R]egister, or X): [/]").strip().lower()
+            student_choice = console.input(f"[{Colors.HEADER}]{Prompts.STUDENT_MENU}[/]").strip().lower()
             if student_choice == "l":
                 student = self.student_login()
                 if student:
                     clear_screen()
-                    console.print(f"Welcome, {student.first_name}!", style="green")
+                    console.print(SuccessMessages.LOGIN.format(first_name=student.first_name), style=Colors.SUCCESS)
                     self.menu_subject_enrollment(student)
             elif student_choice == "r":
                 self.student_register()
             elif student_choice == "x":
                 break
             else:
-                console.print("Invalid student option. Try again.", style="red")
+                console.print(ErrorMessages.INVALID_STUDENT_OPTION, style=Colors.ERROR)
                 
 
     def menu_admin(self) -> None:
         clear_screen()
-        # Admin system prompt (c/g/p/r/s/x)
         while True:
-            console.print("Admin System:", style="cyan")
-            admin_choice = console.input("[cyan][C]lear Database, [G]roup Students, [P]artition Students, [R]emove Student, [S]how Students or [X]: [/]").strip().lower()
+            console.print(InfoMessages.ADMIN_SYSTEM, style=Colors.HEADER)
+            admin_choice = console.input(f"[{Colors.HEADER}]{Prompts.ADMIN_MENU}[/]").strip().lower()
             if admin_choice == "c":
-                # Clear all student data
                 self.admin_clear_all()
             elif admin_choice == "g":
                 self.admin_group_by_grade()
@@ -84,14 +86,18 @@ class CliApp:
             elif admin_choice == "x":
                 break
             else:
-                console.print("Invalid admin option. Try again.", style="red")
+                console.print(ErrorMessages.INVALID_ADMIN_OPTION, style=Colors.ERROR)
                 
 
     def menu_subject_enrollment(self, student: Student) -> None:
         while True:
-            console.print(f"Student Course Menu ({student.first_name} {student.last_name} | ID: {student.student_id})", style="cyan")
-            console.print("[C]hange Password, [E]nroll Subject, [R]emove Subject, [S]how Enrollment, or [X]", style="cyan")
-            choice = console.input("Select an option: ").strip().lower()
+            console.print(InfoMessages.STUDENT_COURSE_MENU.format(
+                first_name=student.first_name, 
+                last_name=student.last_name, 
+                student_id=student.student_id
+            ), style=Colors.HEADER)
+            console.print(InfoMessages.COURSE_MENU_OPTIONS, style=Colors.HEADER)
+            choice = console.input(Prompts.ENROLLMENT_OPTIONS).strip().lower()
             if choice == "c":
                 self.student_change_password(student)
             elif choice == "e":
@@ -103,225 +109,253 @@ class CliApp:
             elif choice == "x":
                 return
             else:
-                console.print("Invalid option. Try again.", style="red")
+                console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
                 
 
     # ------------------------- Student Flows -------------------------
     def student_register(self) -> None:
         clear_screen()
-        console.print("Student Sign Up", style="green")
-        first_name = console.input("First name: ").strip()
-        last_name = console.input("Last name: ").strip()
-        email = console.input("Email (firstname.lastname@university.com): ").strip().lower()
-        password = console.input("Password (Start uppercase, 5+ letters, end with 3 digits): ", password=True).strip()
+        console.print(InfoMessages.STUDENT_SIGN_UP, style=Colors.SUCCESS)
+        first_name = console.input(Prompts.FIRST_NAME).strip()
+        last_name = console.input(Prompts.LAST_NAME).strip()
+        email = console.input(Prompts.EMAIL).strip().lower()
+        password = console.input(Prompts.PASSWORD, password=True).strip()
 
-        # Validations
         if not validate_email(email):
-            console.print("Error: Invalid email format. Expected firstname.lastname@university.com", style="red")
-            
+            console.print(ErrorMessages.INVALID_EMAIL_FORMAT, style=Colors.ERROR)
             return
         if not validate_password(password):
-            console.print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits", style="red")
-            
+            console.print(ErrorMessages.INVALID_PASSWORD_FORMAT, style=Colors.ERROR)
             return
-        # Enforce that email components match provided names
         try:
             fname_part, lname_part = email.split("@")[0].split(".")
         except ValueError:
-            console.print("Error: Invalid email format components.", style="red")
-            
+            console.print(ErrorMessages.INVALID_EMAIL_COMPONENTS, style=Colors.ERROR)
             return
         if fname_part != first_name.lower() or lname_part != last_name.lower():
-            console.print("Error: Email name parts must match first and last name provided.", style="red")
-            
+            console.print(ErrorMessages.EMAIL_NAME_MISMATCH, style=Colors.ERROR)
             return
 
         ok, msg, _student = self.db.add_student(first_name, last_name, email, password)
         if isinstance(msg, str) and msg.startswith("Error"):
-            console.print(msg, style="red")
+            console.print(msg, style=Colors.ERROR)
         else:
             print(msg)
         
 
     def student_login(self) -> Optional[Student]:
         clear_screen()
-        console.print("Student Sign In", style="green")
+        console.print(InfoMessages.STUDENT_SIGN_IN, style=Colors.SUCCESS)
 
         attempts = 0
-        while attempts < 3:
-            email = console.input("Email: ").strip().lower()
-            password = console.input("Password: ", password=True).strip()
+        while attempts < MAX_LOGIN_ATTEMPTS:
+            email = console.input(Prompts.LOGIN_EMAIL).strip().lower()
+            password = console.input(Prompts.LOGIN_PASSWORD, password=True).strip()
             if not validate_email(email) or not validate_password(password):
-                console.print("Incorrect email or password format", style="red")
+                console.print(ErrorMessages.INCORRECT_FORMAT, style=Colors.ERROR)
                 attempts += 1
                 continue
             student = self.db.get_student_by_email(email)
             if not student or not check_password(password, student.password):
-                console.print("Error: Invalid email or password.", style="red")
-                
+                console.print(ErrorMessages.INVALID_CREDENTIALS, style=Colors.ERROR)
                 return None
             return student
-        console.print("Too many failed attempts.", style="red")
+        console.print(ErrorMessages.TOO_MANY_ATTEMPTS, style=Colors.ERROR)
         return None
 
     def student_view_enrollment(self, student: Student) -> None:
         clear_screen()
-        console.print(f"Showing {len(student.subjects)} subjects", style="yellow")
+        console.print(InfoMessages.SHOWING_SUBJECTS.format(count=len(student.subjects)), style=Colors.WARNING)
         if not student.subjects:
-            console.print("No subjects enrolled.")
+            console.print(InfoMessages.NO_SUBJECTS_ENROLLED)
         else:
             for s in student.subjects:
-                console.print(f"[{s.subject_id}] {s.name} - Mark: {s.mark}, Grade: {s.grade}")
+                console.print(FormatTemplates.SUBJECT_ITEM.format(
+                    subject_id=s.subject_id,
+                    name=s.name,
+                    mark=s.mark,
+                    grade=s.grade
+                ))
             avg = student.average_mark()
-            status = "PASS" if student.is_passing() else "FAIL"
-            console.print(f"Average: {avg:.2f} ({status})")
+            status = InfoMessages.STATUS_PASS if student.is_passing() else InfoMessages.STATUS_FAIL
+            console.print(InfoMessages.AVERAGE_STATUS.format(average=avg, status=status))
         
 
     def student_enroll_subject(self, student: Student) -> None:
         clear_screen()
-        console.print("------ Enroll in Subject ------", style="yellow")
+        console.print(InfoMessages.ENROLL_IN_SUBJECT, style=Colors.WARNING)
         if len(student.subjects) >= MAX_SUBJECTS_PER_STUDENT:
-            console.print(f"Error: Subject limit reached ({MAX_SUBJECTS_PER_STUDENT}).", style="red")
+            console.print(ErrorMessages.SUBJECT_LIMIT_REACHED.format(max_subjects=MAX_SUBJECTS_PER_STUDENT), style=Colors.ERROR)
             return
-        name = input("Subject name: ").strip()
+        name = input(Prompts.SUBJECT_NAME).strip()
         if not name:
-            console.print("Error: Subject name cannot be empty.", style="red")
-            
+            console.print(ErrorMessages.SUBJECT_NAME_EMPTY, style=Colors.ERROR)
             return
-        # Prevent duplicate subject names for the same student
         if any(s.name.lower() == name.lower() for s in student.subjects):
-            console.print("Error: Already enrolled in a subject with this name.", style="red")
-            
+            console.print(ErrorMessages.SUBJECT_ALREADY_ENROLLED, style=Colors.ERROR)
             return
         existing_ids = {s.subject_id for s in student.subjects}
         subject = Subject.create(name=name, existing_ids=existing_ids)
         student.subjects.append(subject)
         self.db.update_student(student)
-        console.print(f"Success: Enrolled in {subject.name} with Subject ID {subject.subject_id}. Mark: {subject.mark}, Grade: {subject.grade}")
-        console.print(f"You are now enrolled in {len(student.subjects)} out of {MAX_SUBJECTS_PER_STUDENT} subjects.", style="yellow")
+        console.print(SuccessMessages.ENROLL.format(
+            subject_name=subject.name,
+            subject_id=subject.subject_id,
+            mark=subject.mark,
+            grade=subject.grade
+        ))
+        console.print(SuccessMessages.ENROLL_COUNT.format(
+            count=len(student.subjects),
+            max_subjects=MAX_SUBJECTS_PER_STUDENT
+        ), style=Colors.WARNING)
         
 
     def student_remove_subject(self, student: Student) -> None:
         clear_screen()
         if not student.subjects:
-            console.print("No subjects to remove.", style="red")
+            console.print(ErrorMessages.NO_SUBJECTS_TO_REMOVE, style=Colors.ERROR)
             return
         for s in student.subjects:
-            console.print(f"[{s.subject_id}] {s.name}")
-        subject_id = console.input("Enter Subject ID to remove: ").strip()
+            console.print(FormatTemplates.SUBJECT_LIST_ITEM.format(subject_id=s.subject_id, name=s.name))
+        subject_id = console.input(Prompts.SUBJECT_ID_TO_REMOVE).strip()
         for idx, s in enumerate(student.subjects):
             if s.subject_id == subject_id:
-                console.print(f"Dropping subject {s.subject_id}", style="yellow")
+                console.print(SuccessMessages.REMOVE_SUBJECT.format(subject_id=s.subject_id), style=Colors.WARNING)
                 del student.subjects[idx]
                 self.db.update_student(student)
-                console.print(f"You are now enrolled in {len(student.subjects)} out of {MAX_SUBJECTS_PER_STUDENT} subjects.", style="yellow")
+                console.print(SuccessMessages.ENROLL_COUNT.format(
+                    count=len(student.subjects),
+                    max_subjects=MAX_SUBJECTS_PER_STUDENT
+                ), style=Colors.WARNING)
                 return
-        console.print("Error: Subject not found.", style="red")
+        console.print(ErrorMessages.SUBJECT_NOT_FOUND, style=Colors.ERROR)
 
     def student_change_password(self, student: Student) -> None:
         clear_screen()
-        console.print("Updating Password", style="yellow")
-        new_password = console.input("New password: ", password=True).strip()
+        console.print(InfoMessages.UPDATING_PASSWORD, style=Colors.WARNING)
+        new_password = console.input(Prompts.NEW_PASSWORD, password=True).strip()
         if not validate_password(new_password):
-            console.print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits", style="red")
-            
+            console.print(ErrorMessages.INVALID_PASSWORD_FORMAT, style=Colors.ERROR)
             return
-        confirm_password = console.input("Confirm password: ", password=True).strip()
+        confirm_password = console.input(Prompts.CONFIRM_PASSWORD, password=True).strip()
         if new_password != confirm_password:
-            console.print("Error: Password does not match.", style="red")
+            console.print(ErrorMessages.PASSWORD_MISMATCH, style=Colors.ERROR)
             return
 
         student.password = hash_password(new_password)
         self.db.update_student(student)
-        console.print("Success: Password changed.", style="green")
+        console.print(SuccessMessages.PASSWORD_CHANGED, style=Colors.SUCCESS)
         
 
     # ------------------------- Admin Flows -------------------------
     def admin_list_students(self) -> None:
         clear_screen()
-        console.print("Student List", style="yellow")
+        console.print(InfoMessages.STUDENT_LIST, style=Colors.WARNING)
         students = self.db.list_students()
         if not students:
-            console.print("No students found.", style="red")
-            
+            console.print(ErrorMessages.NO_STUDENTS_FOUND, style=Colors.ERROR)
             return
 
         for s in students:
             avg = s.average_mark()
-            status = "PASS" if s.is_passing() else "FAIL"
-            print(f"{s.student_id} | {s.first_name} {s.last_name} | {s.email} | Subjects: {len(s.subjects)} | Avg: {avg:.2f} ({status})")
+            status = InfoMessages.STATUS_PASS if s.is_passing() else InfoMessages.STATUS_FAIL
+            print(FormatTemplates.STUDENT_DETAIL.format(
+                student_id=s.student_id,
+                first_name=s.first_name,
+                last_name=s.last_name,
+                email=s.email,
+                subject_count=len(s.subjects),
+                average=avg,
+                status=status
+            ))
         
 
     def admin_remove_student(self) -> None:
         clear_screen()
-        console.print("Remove Student", style="red")
-        student_id = console.input("Enter Student ID to remove: ").strip()
+        console.print(InfoMessages.REMOVE_STUDENT, style=Colors.ERROR)
+        student_id = console.input(Prompts.STUDENT_ID_TO_REMOVE).strip()
         ok, msg = self.db.remove_student(student_id)
         if isinstance(msg, str) and msg.startswith("Error"):
-            console.print(msg, style="red")
+            console.print(msg, style=Colors.ERROR)
         else:
             print(msg)
         
 
     def admin_group_by_grade(self) -> None:
         clear_screen()
-        console.print("Grade Grouping", style="yellow")
+        console.print(InfoMessages.GRADE_GROUPING, style=Colors.WARNING)
         students = self.db.list_students()
         if not students:
-            console.print("<Nothing to Display>")
-            
+            console.print(InfoMessages.NOTHING_TO_DISPLAY)
             return
-        # Determine dominant grade per student as the highest grade across subjects; if no subjects, 'N/A'
-        grade_order = {"HD": 4, "D": 3, "C": 2, "P": 1, "F": 0}
-        groups: Dict[str, List[Student]] = {"HD": [], "D": [], "C": [], "P": [], "F": [], "N/A": []}
+        
+        groups: Dict[str, List[Student]] = {g: [] for g in Grades.ALL}
+        
         for s in students:
             if not s.subjects:
-                groups["N/A"].append(s)
+                groups[Grades.NA].append(s)
                 continue
-            best = max((subj.grade for subj in s.subjects), key=lambda g: grade_order.get(g, -1))
+            best = max((subj.grade for subj in s.subjects), key=lambda g: Grades.ORDER.get(g, -1))
             groups[best].append(s)
+            
         for grade, members in groups.items():
-            console.print(f"Grade {grade}:", style="yellow")
+            console.print(InfoMessages.GRADE_LABEL.format(grade=grade), style=Colors.WARNING)
             if not members:
-                console.print("<Nothing to Display>")
+                console.print(InfoMessages.NOTHING_TO_DISPLAY)
             else:
                 for m in members:
-                    print(f"  {m.student_id} | {m.first_name} {m.last_name} | Avg {m.average_mark():.2f}")
+                    print(FormatTemplates.STUDENT_SUMMARY.format(
+                        student_id=m.student_id,
+                        first_name=m.first_name,
+                        last_name=m.last_name,
+                        average=m.average_mark()
+                    ))
         
 
     def admin_partition_pass_fail(self) -> None:
         clear_screen()
-        console.print("PASS/FAIL Partition", style="yellow")
+        console.print(InfoMessages.PASS_FAIL_PARTITION, style=Colors.WARNING)
         students = self.db.list_students()
         if not students:
-            console.print("No students to partition.", style="red")
-            
+            console.print(InfoMessages.NO_STUDENTS_TO_PARTITION, style=Colors.ERROR)
             return
         passed = [s for s in students if s.is_passing()]
         failed = [s for s in students if not s.is_passing()]
-        console.print("PASS:", style="green")
+        
+        console.print(InfoMessages.PASS_LABEL, style=Colors.SUCCESS)
         if not passed:
-            console.print("<Nothing to Display>")
+            console.print(InfoMessages.NOTHING_TO_DISPLAY)
         else:
             for s in passed:
-                console.print(f"  {s.student_id} | {s.first_name} {s.last_name} | Avg {s.average_mark():.2f}")
-        console.print("FAIL:", style="red")
+                console.print(FormatTemplates.STUDENT_SUMMARY.format(
+                    student_id=s.student_id,
+                    first_name=s.first_name,
+                    last_name=s.last_name,
+                    average=s.average_mark()
+                ))
+        
+        console.print(InfoMessages.FAIL_LABEL, style=Colors.ERROR)
         if not failed:
-            console.print("<Nothing to Display>")
+            console.print(InfoMessages.NOTHING_TO_DISPLAY)
         else:
             for s in failed:
-                console.print(f"  {s.student_id} | {s.first_name} {s.last_name} | Avg {s.average_mark():.2f}")
+                console.print(FormatTemplates.STUDENT_SUMMARY.format(
+                    student_id=s.student_id,
+                    first_name=s.first_name,
+                    last_name=s.last_name,
+                    average=s.average_mark()
+                ))
         
 
     def admin_clear_all(self) -> None:
         clear_screen()
-        console.print("Clearing students database", style="red")
-        confirm = console.input("[red]Are you sure you want to clear the database (Y)ES/(N)O?: [/]").strip().upper()
+        console.print(InfoMessages.CLEARING_DATABASE, style=Colors.ERROR)
+        confirm = console.input(f"[{Colors.ERROR}]{Prompts.CONFIRM_CLEAR}[/]").strip().upper()
         if confirm == "Y":
-            self.db.clear_all()
-            console.print("Success: All student data cleared.", style="yellow")
+            self.db.clear_all_students()
+            console.print(SuccessMessages.ALL_CLEARED, style=Colors.WARNING)
         else:
-            console.print("Operation cancelled.", style="red")
+            console.print(SuccessMessages.OPERATION_CANCELLED, style=Colors.ERROR)
         
 
 

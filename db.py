@@ -4,8 +4,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from models.student import Student
 from utils.password import hash_password
-
-DATA_FILE = "students.data"
+from constants import DATA_FILE
 
 
 class Database:
@@ -80,5 +79,5 @@ class Database:
         self._write_all(new_students)
         return True, "Success: Student removed."
 
-    def clear_all(self) -> None:
+    def clear_all_students(self) -> None:
         self._write_all([])

@@ -5,9 +5,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List
 
 from .subject import Subject
-
-
-PASSING_AVERAGE = 50
+from constants import PASSING_AVERAGE
 
 
 @dataclass
