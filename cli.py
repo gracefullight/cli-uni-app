@@ -5,13 +5,6 @@ Features:
 - Students: register, login, enroll/remove subjects (max 4), change password, view enrollment with marks/grades
 - Admins: remove students, list students, group students by grade, partition pass/fail, clear all data
 - Persistence: local file students.data storing all student and subject data (JSON format)
-
-Usage:
-  python3 cliuniapp.py
-
-Notes:
-- Uses only Python standard libraries.
-- All input/output formatting is consistent and robust error handling is implemented.
 """
 from __future__ import annotations
 
@@ -152,15 +145,23 @@ class CLI:
     def student_login(self) -> Optional[Student]:
         clear_screen()
         console.print("Student Sign In", style="green")
-        email = console.input("Email: ").strip().lower()
-        password = console.input("Password: ", password=True).strip()
-        student = self.db.get_student_by_email(email)
-        if not student or not check_password(password, student.password):
-            console.print("Error: Invalid email or password.", style="red")
-            pause()
-            return None
-        
-        return student
+
+        attempts = 0
+        while attempts < 3:
+            email = console.input("Email: ").strip().lower()
+            password = console.input("Password: ", password=True).strip()
+            if not validate_email(email) or not validate_password(password):
+                console.print("Incorrect email or password format", style="red")
+                attempts += 1
+                continue
+            student = self.db.get_student_by_email(email)
+            if not student or not check_password(password, student.password):
+                console.print("Error: Invalid email or password.", style="red")
+                pause()
+                return None
+            return student
+        console.print("Too many failed attempts.", style="red")
+        return None
 
     def student_view_enrollment(self, student: Student) -> None:
         clear_screen()
