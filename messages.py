@@ -164,7 +164,7 @@ class FormatTemplates:
     
     # GUI
     GUI_ENROLLMENT_TITLE = "Enrollment - {first_name} {last_name} ({student_id})"
-    GUI_STUDENT_INFO = "Subjects: {count} | Average: {average:.2f} | Status: {status}"
+    GUI_STUDENT_INFO = "Subjects: {num_subjects} | Average: {avg:.2f} | Status: {pass_fail}"
     GUI_SUBJECT_ROW = "{subject_id} - {name}"
 
 
