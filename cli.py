@@ -217,44 +217,9 @@ class CLI:
             # Prompt format: University System: (A)dmin, (S)tudent, or X : 
             choice = console.input("[cyan]University System: (A)dmin, (S)tudent, or X : [/]").strip().lower()
             if choice == "a":
-                # Admin system prompt (c/g/p/r/s/x)
-                while True:
-                    admin_choice = console.input("[cyan]Admin System (c/g/p/r/s/x): [/]").strip().lower()
-                    if admin_choice == "c":
-                        # Clear all student data
-                        self.admin_clear_all()
-                    elif admin_choice == "g":
-                        self.admin_group_by_grade()
-                    elif admin_choice == "p":
-                        self.admin_partition_pass_fail()
-                    elif admin_choice == "r":
-                        self.admin_remove_student()
-                    elif admin_choice == "s":
-                        self.admin_list_students()
-                    elif admin_choice == "x":
-                        break
-                    else:
-                        console.print("Invalid admin option. Try again.", style="red")
-                        pause()
+                self.menu_admin()
             elif choice == "s":
-                # Student system prompt (l/r/z/x) - login/register/back/exit
-                while True:
-                    student_choice = console.input("[cyan]Student System (l/r/z/x): [/]").strip().lower()
-                    if student_choice == "l":
-                        student = self.student_login()
-                        if student:
-                            self.menu_subject_enrollment(student)
-                    elif student_choice == "r":
-                        self.student_register()
-                    elif student_choice == "z":
-                        # 'z' used as Back in screenshot (maps to returning to main prompt)
-                        break
-                    elif student_choice == "x":
-                        print("Thank You")
-                        return
-                    else:
-                        console.print("Invalid student option. Try again.", style="red")
-                        pause()
+                self.menu_student()
             elif choice == "x":
                 console.print("Thank You", style="yellow")
                 return
@@ -263,50 +228,41 @@ class CLI:
                 pause()
 
     def menu_student(self) -> None:
+        # Student system prompt (l/r/x) - login/register/back
         while True:
-            clear_screen()
-            print("------ Student Menu ------")
-            print("1. Register")
-            print("2. Login")
-            print("3. Back")
-            choice = input("Select an option: ").strip()
-            if choice == "1":
-                self.student_register()
-            elif choice == "2":
+            student_choice = console.input("[cyan]Student System (l/r/x): [/]").strip().lower()
+            if student_choice == "l":
                 student = self.student_login()
                 if student:
                     self.menu_subject_enrollment(student)
-            elif choice == "3":
-                return
+            elif student_choice == "r":
+                self.student_register()
+            elif student_choice == "x":
+                break
             else:
-                console.print("Invalid option. Try again.", style="red")
+                console.print("Invalid student option. Try again.", style="red")
                 pause()
 
     def menu_admin(self) -> None:
+        clear_screen()
+        # Admin system prompt (c/g/p/r/s/x)
         while True:
-            clear_screen()
-            print("------ Admin Menu ------")
-            print("1. List Students")
-            print("2. Remove Student")
-            print("3. Group Students by Grade")
-            print("4. Partition Students by Pass/Fail")
-            print("5. Clear All Student Data")
-            print("6. Back")
-            choice = input("Select an option: ").strip()
-            if choice == "1":
-                self.admin_list_students()
-            elif choice == "2":
-                self.admin_remove_student()
-            elif choice == "3":
-                self.admin_group_by_grade()
-            elif choice == "4":
-                self.admin_partition_pass_fail()
-            elif choice == "5":
+            admin_choice = console.input("[cyan]Admin System (c/g/p/r/s/x): [/]").strip().lower()
+            if admin_choice == "c":
+                # Clear all student data
                 self.admin_clear_all()
-            elif choice == "6":
-                return
+            elif admin_choice == "g":
+                self.admin_group_by_grade()
+            elif admin_choice == "p":
+                self.admin_partition_pass_fail()
+            elif admin_choice == "r":
+                self.admin_remove_student()
+            elif admin_choice == "s":
+                self.admin_list_students()
+            elif admin_choice == "x":
+                break
             else:
-                print("Invalid option. Try again.")
+                console.print("Invalid admin option. Try again.", style="red")
                 pause()
 
     def menu_subject_enrollment(self, student: Student) -> None:
