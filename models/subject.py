@@ -4,22 +4,12 @@ import random
 from dataclasses import dataclass, asdict
 from typing import Dict
 
-from constants import Grades
+from constants import SUBJECT_ID_LENGTH
+from utils.id_generator import generate_unique_id
+from utils.grade_calculator import calculate_grade
 
 
-def calculate_grade(mark: int) -> str:
-    """Return grade string based on mark."""
-    if mark >= Grades.THRESHOLDS[Grades.HD]:
-        return Grades.HD
-    if mark >= Grades.THRESHOLDS[Grades.D]:
-        return Grades.D
-    if mark >= Grades.THRESHOLDS[Grades.C]:
-        return Grades.C
-    if mark >= Grades.THRESHOLDS[Grades.P]:
-        return Grades.P
-    return Grades.F
-
-
+# Person A: Authentication & Core Models
 @dataclass
 class Subject:
     """Represents a subject enrollment with an ID, name, mark, and grade."""
@@ -30,14 +20,9 @@ class Subject:
     grade: str
 
     @staticmethod
-    def generate_id(existing_ids: set[str], length: int = 3) -> str:
+    def generate_id(existing_ids: set[str]) -> str:
         """Generate a unique numeric string ID of given length not present in existing_ids."""
-        lower = 10 ** (length - 1)
-        upper = (10 ** length) - 1
-        while True:
-            candidate = str(random.randint(lower, upper))
-            if candidate not in existing_ids:
-                return candidate
+        return generate_unique_id(existing_ids, SUBJECT_ID_LENGTH)
 
     @staticmethod
     def create(name: str, existing_ids: set[str]) -> "Subject":

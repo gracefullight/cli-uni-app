@@ -33,9 +33,11 @@ class Database:
             json.dump(serializable, f, indent=2)
 
     # CRUD operations
+    # Person D: Admin System & Database
     def list_students(self) -> List[Student]:
         return self._read_all()
 
+    # Person A: Authentication
     def get_student_by_email(self, email: str) -> Optional[Student]:
         for s in self._read_all():
             if s.email == email:
@@ -48,6 +50,7 @@ class Database:
                 return s
         return None
 
+    # Person A: Authentication
     def add_student(self, first_name: str, last_name: str, email: str, password: str) -> Tuple[bool, str, Optional[Student]]:
         students = self._read_all()
         if any(s.email == email for s in students):
@@ -60,6 +63,7 @@ class Database:
         self._write_all(students)
         return True, f"Success: Student registered with ID {student_id}.", new_student
 
+    # Person B: Student Enrollment Features
     def update_student(self, updated: Student) -> None:
         students = self._read_all()
         for idx, s in enumerate(students):
@@ -71,6 +75,7 @@ class Database:
         students.append(updated)
         self._write_all(students)
 
+    # Person D: Admin System & Database
     def remove_student(self, student_id: str) -> Tuple[bool, str]:
         students = self._read_all()
         new_students = [s for s in students if s.student_id != student_id]
@@ -79,5 +84,6 @@ class Database:
         self._write_all(new_students)
         return True, "Success: Student removed."
 
+    # Person D: Admin System & Database
     def clear_all_students(self) -> None:
         self._write_all([])

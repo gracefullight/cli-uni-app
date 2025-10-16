@@ -65,9 +65,10 @@ class CliApp:
             elif student_choice == "x":
                 break
             else:
-                console.print(ErrorMessages.INVALID_STUDENT_OPTION, style=Colors.ERROR)
+                console.print(ErrorMessages.INVALID_ADMIN_OPTION, style=Colors.ERROR)
                 
 
+    # Person D: Admin System & Database
     def menu_admin(self) -> None:
         clear_screen()
         while True:
@@ -86,9 +87,10 @@ class CliApp:
             elif admin_choice == "x":
                 break
             else:
-                console.print(ErrorMessages.INVALID_ADMIN_OPTION, style=Colors.ERROR)
+                console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
                 
 
+    # Person C: Student Management & Password
     def menu_subject_enrollment(self, student: Student) -> None:
         while True:
             console.print(InfoMessages.STUDENT_COURSE_MENU.format(
@@ -113,6 +115,7 @@ class CliApp:
                 
 
     # ------------------------- Student Flows -------------------------
+    # Person A: Authentication
     def student_register(self) -> None:
         clear_screen()
         console.print(InfoMessages.STUDENT_SIGN_UP, style=Colors.SUCCESS)
@@ -143,6 +146,7 @@ class CliApp:
             console.print(msg)
         
 
+    # Person A: Authentication
     def student_login(self) -> Optional[Student]:
         clear_screen()
         console.print(InfoMessages.STUDENT_SIGN_IN, style=Colors.SUCCESS)
@@ -163,6 +167,7 @@ class CliApp:
         console.print(ErrorMessages.TOO_MANY_ATTEMPTS, style=Colors.ERROR)
         return None
 
+    # Person B: Student Enrollment Features
     def student_view_enrollment(self, student: Student) -> None:
         clear_screen()
         console.print(InfoMessages.SHOWING_SUBJECTS.format(count=len(student.subjects)), style=Colors.WARNING)
@@ -181,6 +186,7 @@ class CliApp:
             console.print(InfoMessages.AVERAGE_STATUS.format(average=avg, status=status))
         
 
+    # Person B: Student Enrollment Features
     def student_enroll_subject(self, student: Student) -> None:
         clear_screen()
         console.print(InfoMessages.ENROLL_IN_SUBJECT, style=Colors.WARNING)
@@ -210,6 +216,7 @@ class CliApp:
         ), style=Colors.WARNING)
         
 
+    # Person B: Student Enrollment Features
     def student_remove_subject(self, student: Student) -> None:
         clear_screen()
         if not student.subjects:
@@ -230,6 +237,7 @@ class CliApp:
                 return
         console.print(ErrorMessages.SUBJECT_NOT_FOUND, style=Colors.ERROR)
 
+    # Person C: Student Management & Password
     def student_change_password(self, student: Student) -> None:
         clear_screen()
         console.print(InfoMessages.UPDATING_PASSWORD, style=Colors.WARNING)
@@ -248,6 +256,7 @@ class CliApp:
         
 
     # ------------------------- Admin Flows -------------------------
+    # Person D: Admin System & Database
     def admin_list_students(self) -> None:
         clear_screen()
         console.print(InfoMessages.STUDENT_LIST, style=Colors.WARNING)
@@ -270,6 +279,7 @@ class CliApp:
             ))
         
 
+    # Person D: Admin System & Database
     def admin_remove_student(self) -> None:
         clear_screen()
         console.print(InfoMessages.REMOVE_STUDENT, style=Colors.ERROR)
@@ -281,6 +291,7 @@ class CliApp:
             console.print(msg)
         
 
+    # Person D: Admin System & Database
     def admin_group_by_grade(self) -> None:
         clear_screen()
         console.print(InfoMessages.GRADE_GROUPING, style=Colors.WARNING)
@@ -311,6 +322,7 @@ class CliApp:
                     ))
         
 
+    # Person D: Admin System & Database
     def admin_partition_pass_fail(self) -> None:
         clear_screen()
         console.print(InfoMessages.PASS_FAIL_PARTITION, style=Colors.WARNING)
@@ -346,6 +358,7 @@ class CliApp:
                 ))
         
 
+    # Person D: Admin System & Database
     def admin_clear_all(self) -> None:
         clear_screen()
         console.print(InfoMessages.CLEARING_DATABASE, style=Colors.ERROR)

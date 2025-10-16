@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-import random
 from dataclasses import dataclass, field
 from typing import Dict, List
 
 from .subject import Subject
-from constants import PASSING_AVERAGE
+from constants import PASSING_AVERAGE, STUDENT_ID_LENGTH
+from utils.id_generator import generate_unique_id
 
 
+# Person A: Authentication & Core Models
 @dataclass
 class Student:
     """Represents a student with ID, name, email, password, and enrolled subjects."""
@@ -30,14 +31,9 @@ class Student:
         }
 
     @staticmethod
-    def generate_id(existing_ids: set[str], length: int = 6) -> str:
+    def generate_id(existing_ids: set[str]) -> str:
         """Generate a unique numeric string ID of given length not present in existing_ids."""
-        lower = 10 ** (length - 1)
-        upper = (10 ** length) - 1
-        while True:
-            candidate = str(random.randint(lower, upper))
-            if candidate not in existing_ids:
-                return candidate
+        return generate_unique_id(existing_ids, STUDENT_ID_LENGTH)
 
     @staticmethod
     def from_dict(data: Dict) -> "Student":
