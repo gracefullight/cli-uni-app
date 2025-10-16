@@ -13,194 +13,20 @@ Notes:
 - Uses only Python standard libraries.
 - All input/output formatting is consistent and robust error handling is implemented.
 """
-
 from __future__ import annotations
 
-import json
-import os
-import random
-from dataclasses import dataclass, asdict, field
-from typing import Dict, List, Optional, Tuple
-
+from typing import Dict, List, Optional
 from rich.console import Console
-
 from utils.cmd import clear_screen, pause
 from utils.password import validate_email, validate_password, hash_password, check_password
+from models.student import Student
+from models.subject import Subject
+from db import Database
 
 # rich console for colored output
 console = Console()
 
-
-DATA_FILE = "students.data"
 MAX_SUBJECTS_PER_STUDENT = 4
-PASSING_AVERAGE = 50
-
-def generate_unique_id(existing_ids: set[str], length: int) -> str:
-    """Generate a unique numeric string ID of given length not present in existing_ids."""
-    lower = 10 ** (length - 1)
-    upper = (10 ** length) - 1
-    while True:
-        candidate = str(random.randint(lower, upper))
-        if candidate not in existing_ids:
-            return candidate
-
-def calculate_grade(mark: int) -> str:
-    """Return grade string based on mark."""
-    if mark >= 85:
-        return "HD"  # High Distinction
-    if mark >= 75:
-        return "D"   # Distinction
-    if mark >= 65:
-        return "C"   # Credit
-    if mark >= 50:
-        return "P"   # Pass
-    return "F"       # Fail
-
-@dataclass
-class Subject:
-    """Represents a subject enrollment with an ID, name, mark, and grade."""
-
-    subject_id: str
-    name: str
-    mark: int
-    grade: str
-
-    @staticmethod
-    def create(name: str, existing_ids: set[str]) -> "Subject":
-        """Create a new subject with unique 3-digit ID and random mark."""
-        subject_id = generate_unique_id(existing_ids, 3)
-        mark = random.randint(0, 100)
-        grade = calculate_grade(mark)
-        return Subject(subject_id=subject_id, name=name, mark=mark, grade=grade)
-
-    def to_dict(self) -> Dict:
-        return asdict(self)
-
-    @staticmethod
-    def from_dict(data: Dict) -> "Subject":
-        return Subject(
-            subject_id=str(data["subject_id"]),
-            name=str(data["name"]),
-            mark=int(data["mark"]),
-            grade=str(data["grade"]),
-        )
-
-
-@dataclass
-class Student:
-    """Represents a student with ID, name, email, password, and enrolled subjects."""
-
-    student_id: str
-    first_name: str
-    last_name: str
-    email: str
-    password: str
-    subjects: List[Subject] = field(default_factory=list)
-
-    def to_dict(self) -> Dict:
-        return {
-            "student_id": self.student_id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email,
-            "password": self.password,
-            "subjects": [s.to_dict() for s in self.subjects],
-        }
-
-    @staticmethod
-    def from_dict(data: Dict) -> "Student":
-        return Student(
-            student_id=str(data["student_id"]),
-            first_name=str(data["first_name"]),
-            last_name=str(data["last_name"]),
-            email=str(data["email"]),
-            password=str(data["password"]),
-            subjects=[Subject.from_dict(s) for s in data.get("subjects", [])],
-        )
-
-    def average_mark(self) -> float:
-        if not self.subjects:
-            return 0.0
-        return sum(s.mark for s in self.subjects) / len(self.subjects)
-
-    def is_passing(self) -> bool:
-        return self.average_mark() >= PASSING_AVERAGE
-
-
-class Database:
-    """Simple JSON-file backed database for students and subjects."""
-
-    def __init__(self, filepath: str = DATA_FILE) -> None:
-        self.filepath = filepath
-        self._ensure_file()
-
-    def _ensure_file(self) -> None:
-        if not os.path.exists(self.filepath):
-            self._write_all([])
-
-    def _read_all(self) -> List[Student]:
-        try:
-            with open(self.filepath, "r", encoding="utf-8") as f:
-                data = json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError):
-            data = []
-        students = [Student.from_dict(d) for d in data]
-        return students
-
-    def _write_all(self, students: List[Student | Dict]) -> None:
-        serializable = [s.to_dict() if isinstance(s, Student) else s for s in students]
-        with open(self.filepath, "w", encoding="utf-8") as f:
-            json.dump(serializable, f, indent=2)
-
-    # CRUD operations
-    def list_students(self) -> List[Student]:
-        return self._read_all()
-
-    def get_student_by_email(self, email: str) -> Optional[Student]:
-        for s in self._read_all():
-            if s.email == email:
-                return s
-        return None
-
-    def get_student_by_id(self, student_id: str) -> Optional[Student]:
-        for s in self._read_all():
-            if s.student_id == student_id:
-                return s
-        return None
-
-    def add_student(self, first_name: str, last_name: str, email: str, password: str) -> Tuple[bool, str, Optional[Student]]:
-        students = self._read_all()
-        if any(s.email == email for s in students):
-            return False, "Error: Email already registered.", None
-        existing_ids = {s.student_id for s in students}
-        student_id = generate_unique_id(existing_ids, 6)
-        hashed_password = hash_password(password)
-        new_student = Student(student_id=student_id, first_name=first_name, last_name=last_name, email=email, password=hashed_password, subjects=[])
-        students.append(new_student)
-        self._write_all(students)
-        return True, f"Success: Student registered with ID {student_id}.", new_student
-
-    def update_student(self, updated: Student) -> None:
-        students = self._read_all()
-        for idx, s in enumerate(students):
-            if s.student_id == updated.student_id:
-                students[idx] = updated
-                self._write_all(students)
-                return
-        # If not found, append (should not happen in normal flow)
-        students.append(updated)
-        self._write_all(students)
-
-    def remove_student(self, student_id: str) -> Tuple[bool, str]:
-        students = self._read_all()
-        new_students = [s for s in students if s.student_id != student_id]
-        if len(new_students) == len(students):
-            return False, "Error: Student not found."
-        self._write_all(new_students)
-        return True, "Success: Student removed."
-
-    def clear_all(self) -> None:
-        self._write_all([])
 
 class CLI:
     """Main CLI controller for menus and user interaction."""
@@ -230,10 +56,12 @@ class CLI:
     def menu_student(self) -> None:
         # Student system prompt (l/r/x) - login/register/back
         while True:
-            student_choice = console.input("[cyan]Student System (l/r/x): [/]").strip().lower()
+            student_choice = console.input("[cyan]Student System: [L]ogin, [R]egister, or X): [/]").strip().lower()
             if student_choice == "l":
                 student = self.student_login()
                 if student:
+                    clear_screen()
+                    console.print(f"Welcome, {student.first_name}!", style="green")
                     self.menu_subject_enrollment(student)
             elif student_choice == "r":
                 self.student_register()
@@ -267,36 +95,31 @@ class CLI:
 
     def menu_subject_enrollment(self, student: Student) -> None:
         while True:
-            clear_screen()
-            print(f"------ Subject Enrollment ({student.first_name} {student.last_name} | ID: {student.student_id}) ------")
-            print("1. View Enrollment")
-            print("2. Enroll in Subject")
-            print("3. Remove Subject")
-            print("4. Change Password")
-            print("5. Logout")
-            choice = input("Select an option: ").strip()
-            if choice == "1":
-                self.student_view_enrollment(student)
-            elif choice == "2":
-                self.student_enroll_subject(student)
-            elif choice == "3":
-                self.student_remove_subject(student)
-            elif choice == "4":
+            console.print(f"Student Course Menu ({student.first_name} {student.last_name} | ID: {student.student_id})", style="cyan")
+            console.print("[C]hange Password, [E]nroll Subject, [R]emove Subject, [S]how Enrollment, or X", style="cyan")
+            choice = console.input("Select an option: ").strip().lower()
+            if choice == "c":
                 self.student_change_password(student)
-            elif choice == "5":
+            elif choice == "e":
+                self.student_enroll_subject(student)
+            elif choice == "r":
+                self.student_remove_subject(student)
+            elif choice == "s":
+                self.student_view_enrollment(student)
+            elif choice == "x":
                 return
             else:
-                print("Invalid option. Try again.")
+                console.print("Invalid option. Try again.", style="red")
                 pause()
 
     # ------------------------- Student Flows -------------------------
     def student_register(self) -> None:
         clear_screen()
-        print("------ Student Registration ------")
-        first_name = input("First name: ").strip()
-        last_name = input("Last name: ").strip()
-        email = input("Email (firstname.lastname@university.com): ").strip().lower()
-        password = input("Password (Start uppercase, 5+ letters, end with 3 digits): ").strip()
+        console.print("Student Sign Up", style="green")
+        first_name = console.input("First name: ").strip()
+        last_name = console.input("Last name: ").strip()
+        email = console.input("Email (firstname.lastname@university.com): ").strip().lower()
+        password = console.input("Password (Start uppercase, 5+ letters, end with 3 digits): ", password=True).strip()
 
         # Validations
         if not validate_email(email):
@@ -328,16 +151,15 @@ class CLI:
 
     def student_login(self) -> Optional[Student]:
         clear_screen()
-        print("------ Student Login ------")
-        email = input("Email: ").strip().lower()
-        password = input("Password: ").strip()
+        console.print("Student Sign In", style="green")
+        email = console.input("Email: ").strip().lower()
+        password = console.input("Password: ", password=True).strip()
         student = self.db.get_student_by_email(email)
         if not student or not check_password(password, student.password):
             console.print("Error: Invalid email or password.", style="red")
             pause()
             return None
-        print(f"Welcome, {student.first_name}!")
-        pause("Press Enter to continue to Subject Enrollment...")
+        
         return student
 
     def student_view_enrollment(self, student: Student) -> None:
@@ -399,20 +221,20 @@ class CLI:
 
     def student_change_password(self, student: Student) -> None:
         clear_screen()
-        print("------ Change Password ------")
-        old = input("Current password: ").strip()
-        if not check_password(old, student.password):
-            console.print("Error: Current password incorrect.", style="red")
-            pause()
-            return
-        new = input("New password: ").strip()
-        if not validate_password(new):
+        console.print("Updating Password", style="yellow")
+        new_password = console.input("New password: ", password=True).strip()
+        if not validate_password(new_password):
             console.print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits", style="red")
             pause()
             return
-        student.password = hash_password(new)
+        confirm_password = console.input("Confirm password: ", password=True).strip()
+        if new_password != confirm_password:
+            console.print("Error: Passwords do not match.", style="red")
+            return
+
+        student.password = hash_password(new_password)
         self.db.update_student(student)
-        print("Success: Password changed.")
+        console.print("Success: Password changed.", style="green")
         pause()
 
     # ------------------------- Admin Flows -------------------------
@@ -504,7 +326,7 @@ class CLI:
 
 
 def main() -> None:
-    db = Database(os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FILE))
+    db = Database()
     cli = CLI(db)
     cli.run()
 

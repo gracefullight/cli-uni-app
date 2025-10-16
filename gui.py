@@ -12,15 +12,11 @@ This GUI uses the same persistence and validations from cliuniapp.py.
 
 from __future__ import annotations
 
-import os
 import tkinter as tk
 from tkinter import messagebox
 
-from cli import (
-    Database,
-    Subject,
-    DATA_FILE,
-)
+from db import Database
+from models.subject import Subject
 from utils.password import validate_email, validate_password, hash_password, check_password
 
 
@@ -28,7 +24,7 @@ class App:
     def __init__(self) -> None:
         self.root = tk.Tk()
         self.root.title("GUIUniApp")
-        self.db = Database(os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FILE))
+        self.db = Database()
         self.current_student = None
         self._container = tk.Frame(self.root)
         self._container.pack(fill=tk.BOTH, expand=True)
