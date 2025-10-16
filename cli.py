@@ -21,7 +21,7 @@ console = Console()
 
 MAX_SUBJECTS_PER_STUDENT = 4
 
-class CLI:
+class CliApp:
     """Main CLI controller for menus and user interaction."""
 
     def __init__(self, db: Database) -> None:
@@ -327,7 +327,7 @@ class CLI:
 
 def main() -> None:
     db = Database()
-    cli = CLI(db)
+    cli = CliApp(db)
     cli.run()
 
 

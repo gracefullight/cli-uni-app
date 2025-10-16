@@ -23,14 +23,14 @@ from models.student import Student
 from utils.password import validate_email, validate_password, hash_password, check_password
 
 
-class App:
-    def __init__(self) -> None:
+class GuiApp:
+    def __init__(self, db: Database) -> None:
         ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("blue")
         self.root = ctk.CTk()
         self.root.title("GUIUniApp")
         self.root.geometry("500x400")
-        self.db = Database()
+        self.db = db
         self.current_student: Optional[Student] = None
         self._container = ctk.CTkFrame(self.root)
         self._container.pack(fill="both", expand=True)
@@ -316,7 +316,8 @@ class App:
             pass
 
 def main() -> None:
-    app = App()
+    db = Database()
+    app = GuiApp(db)
     app.root.mainloop()
 
 
