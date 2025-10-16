@@ -12,7 +12,7 @@ This GUI uses the same persistence and validations from cliuniapp.py.
 
 from __future__ import annotations
 
-import customtkinter as ctk
+import customtkinter as ctk  # type: ignore
 import tkinter as tk
 from tkinter import messagebox
 from typing import Optional
