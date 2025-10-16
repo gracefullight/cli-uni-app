@@ -8,7 +8,7 @@ from constants import PASSING_AVERAGE, STUDENT_ID_LENGTH
 from utils.id_generator import generate_unique_id
 
 
-# Person A: Authentication & Core Models
+# Person A: Models & Utils (Data Layer)
 @dataclass
 class Student:
     """Represents a student with ID, name, email, password, and enrolled subjects."""

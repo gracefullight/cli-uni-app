@@ -9,7 +9,7 @@ from utils.id_generator import generate_unique_id
 from utils.grade_calculator import calculate_grade
 
 
-# Person A: Authentication & Core Models
+# Person A: Models & Utils (Data Layer)
 @dataclass
 class Subject:
     """Represents a subject enrollment with an ID, name, mark, and grade."""

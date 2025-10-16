@@ -4,7 +4,7 @@ import re
 import bcrypt
 
 
-# Person A: Authentication
+# Person A: Models & Utils (Data Layer)
 def validate_email(email: str) -> bool:
     """Validate email format: firstname.lastname@university.com"""
     pattern = r"^[a-z]+\.[a-z]+@university\.com$"

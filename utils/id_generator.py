@@ -3,7 +3,7 @@
 import random
 
 
-# Person A: Authentication & Core Models
+# Person A: Models & Utils (Data Layer)
 def generate_unique_id(existing_ids: set[str], length: int) -> str:
     """Generate a unique numeric string ID of given length not present in existing_ids."""
     lower = 10 ** (length - 1)
