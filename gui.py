@@ -410,33 +410,11 @@ class App:
         status = "PASS" if (avg >= 50 and count > 0) else ("N/A" if count == 0 else "FAIL")
         self.lbl_student_info.config(text=f"Subjects: {count} | Average: {avg:.2f} | Status: {status}")
 
-    # ---------------- Test helpers ----------------
-    def test_fixture_register_student(self, first_name: str, last_name: str, email: str, password: str):
-        ok, _msg, student = self.db.add_student(first_name, last_name, email, password)
-        if not ok:
-            # Try to fetch existing
-            student = self.db.get_student_by_email(email)
-        return student
-
-    def ensure_logged_in_for_tests(self, email: str, password: str) -> None:
-        # If student does not exist, create a default one
-        names = email.split("@")[0].split(".") if "@" in email and "." in email else ["test", "user"]
-        first_name = names[0]
-        last_name = names[1] if len(names) > 1 else "user"
-        student = self.test_fixture_register_student(first_name, last_name, email, password)
-        self.current_student = student
-        self.show_enrollment(student)
-
     def destroy(self) -> None:
         try:
             self.root.destroy()
         except Exception:
             pass
-
-
-def launch_app() -> App:
-    return App()
-
 
 def main() -> None:
     """Launch the GUI application and start the Tk main loop.
@@ -444,7 +422,7 @@ def main() -> None:
     This wrapper is used as a console script entry point so the GUI can be
     started with a simple command (e.g. `guiuniapp`).
     """
-    app = launch_app()
+    app = App()
     app.root.mainloop()
 
 
