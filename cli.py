@@ -26,7 +26,6 @@ from services.admin_service import AdminService
 console = Console()
 
 
-# Person C: CLI Interface
 class CliApp:
     """Main CLI application with menu navigation."""
 
@@ -35,6 +34,7 @@ class CliApp:
         self.admin_controller = admin_controller
 
     # ------------------------- Menu Rendering -------------------------
+    # Member 1: Responsible for the main application flow
     def run(self) -> None:
         while True:
             clear_screen()
@@ -50,7 +50,7 @@ class CliApp:
             else:
                 console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
 
-    # Person C: CLI Interface
+    # Member 1: Responsible for Student Registration and Login
     def menu_student(self) -> None:
         while True:
             student_choice = console.input(f"[{Colors.HEADER}]{Prompts.STUDENT_MENU}[/]").strip().lower()
@@ -67,7 +67,7 @@ class CliApp:
             else:
                 console.print(ErrorMessages.INVALID_ADMIN_OPTION, style=Colors.ERROR)
 
-    # Person C: CLI Interface
+    # Member 3: Responsible for the Admin System
     def menu_admin(self) -> None:
         clear_screen()
         while True:
@@ -88,7 +88,7 @@ class CliApp:
             else:
                 console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
 
-    # Person C: CLI Interface
+    # Member 2: Responsible for Subject Enrollment
     def menu_subject_enrollment(self, student) -> None:
         while True:
             console.print(InfoMessages.STUDENT_COURSE_MENU.format(
@@ -111,6 +111,7 @@ class CliApp:
             else:
                 console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
 
+# Shared responsibility: Application entry point
 def main() -> None:
     db = Database()
     student_service = StudentService(db)

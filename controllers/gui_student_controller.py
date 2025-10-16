@@ -7,7 +7,7 @@ from models.subject import Subject
 from services.student_service import StudentService
 
 
-# Person D: GUI Interface
+# Member 4: Responsible for GUI Development
 class GUIStudentController:
     """Controller for GUI student operations."""
 
@@ -17,7 +17,7 @@ class GUIStudentController:
     def login(self, email: str, password: str) -> Optional[Student]:
         """
         Validate and login student.
-        
+
         Returns:
             Student if successful, None otherwise
         Raises:
@@ -28,18 +28,20 @@ class GUIStudentController:
     def enroll_subject(self, student: Student) -> Tuple[Student, Subject]:
         """
         Enroll student in a new subject.
-        
+
         Returns:
             Tuple of (updated_student, new_subject)
         Raises:
             ValueError with error message if enrollment fails
         """
-        return self.student_service.enroll_subject(student)
+        # For the GUI, we use a simplified enroll_subject without a name
+        # The service creates a default name.
+        return self.student_service.enroll_subject(student, f"Subject-{len(student.subjects) + 1}")
 
     def remove_subject(self, student: Student, subject_id: str) -> Student:
         """
         Remove a subject from student's enrollment.
-        
+
         Returns:
             Updated student
         Raises:
@@ -47,13 +49,17 @@ class GUIStudentController:
         """
         return self.student_service.remove_subject(student, subject_id)
 
-    def change_password(self, student: Student, new_password: str, confirm_password: str) -> Student:
+    def change_password(
+        self, student: Student, new_password: str, confirm_password: str
+    ) -> Student:
         """
         Change student's password.
-        
+
         Returns:
             Updated student
         Raises:
             ValueError with error message if password change fails
         """
-        return self.student_service.change_password(student, new_password, confirm_password)
+        return self.student_service.change_password(
+            student, new_password, confirm_password
+        )

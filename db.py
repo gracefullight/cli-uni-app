@@ -7,6 +7,7 @@ from utils.password import hash_password
 from constants import DATA_FILE
 
 
+# This class is a shared responsibility, used by all members.
 class Database:
     """Simple JSON-file backed database for students and subjects."""
 
@@ -32,39 +33,47 @@ class Database:
         with open(self.filepath, "w", encoding="utf-8") as f:
             json.dump(serializable, f, indent=2)
 
-    # Person B: Database Layer
-    # CRUD operations
+    # Member 3: Responsible for the Admin System
     def list_students(self) -> List[Student]:
         return self._read_all()
 
-    # Person B: Database Layer
+    # Member 1: Responsible for Student Registration and Login
     def get_student_by_email(self, email: str) -> Optional[Student]:
         for s in self._read_all():
             if s.email == email:
                 return s
         return None
 
-    # Person B: Database Layer
+    # Shared method
     def get_student_by_id(self, student_id: str) -> Optional[Student]:
         for s in self._read_all():
             if s.student_id == student_id:
                 return s
         return None
 
-    # Person B: Database Layer
-    def add_student(self, first_name: str, last_name: str, email: str, password: str) -> Tuple[bool, str, Optional[Student]]:
+    # Member 1: Responsible for Student Registration and Login
+    def add_student(
+        self, first_name: str, last_name: str, email: str, password: str
+    ) -> Tuple[bool, str, Optional[Student]]:
         students = self._read_all()
         if any(s.email == email for s in students):
             return False, "Error: Email already registered.", None
         existing_ids = {s.student_id for s in students}
         student_id = Student.generate_id(existing_ids)
         hashed_password = hash_password(password)
-        new_student = Student(student_id=student_id, first_name=first_name, last_name=last_name, email=email, password=hashed_password, subjects=[])
+        new_student = Student(
+            student_id=student_id,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=hashed_password,
+            subjects=[],
+        )
         students.append(new_student)
         self._write_all(students)
         return True, f"Success: Student registered with ID {student_id}.", new_student
 
-    # Person B: Database Layer
+    # Shared method for updating student data
     def update_student(self, updated: Student) -> None:
         students = self._read_all()
         for idx, s in enumerate(students):
@@ -76,7 +85,7 @@ class Database:
         students.append(updated)
         self._write_all(students)
 
-    # Person B: Database Layer
+    # Member 3: Responsible for the Admin System
     def remove_student(self, student_id: str) -> Tuple[bool, str]:
         students = self._read_all()
         new_students = [s for s in students if s.student_id != student_id]
@@ -85,6 +94,6 @@ class Database:
         self._write_all(new_students)
         return True, "Success: Student removed."
 
-    # Person B: Database Layer
+    # Member 3: Responsible for the Admin System
     def clear_all_students(self) -> None:
         self._write_all([])

@@ -3,7 +3,12 @@
 from typing import Optional, Tuple
 
 from constants import MAX_SUBJECTS_PER_STUDENT
-from utils.password import validate_email, validate_password, hash_password, check_password
+from utils.password import (
+    validate_email,
+    validate_password,
+    hash_password,
+    check_password,
+)
 from models.student import Student
 from models.subject import Subject
 from db import Database
@@ -15,6 +20,7 @@ class StudentService:
     def __init__(self, db: Database) -> None:
         self.db = db
 
+    # Member 1: Responsible for Student Registration and Login
     def register(
         self, first_name: str, last_name: str, email: str, password: str
     ) -> Tuple[bool, str, Optional[Student]]:
@@ -32,6 +38,7 @@ class StudentService:
 
         return self.db.add_student(first_name, last_name, email, password)
 
+    # Member 1: Responsible for Student Registration and Login
     def login(self, email: str, password: str) -> Optional[Student]:
         """
         Validate and login student.
@@ -53,7 +60,10 @@ class StudentService:
 
         return student
 
-    def enroll_subject(self, student: Student, subject_name: str) -> Tuple[Student, Subject]:
+    # Member 2: Responsible for Subject Enrollment and Grade Calculation
+    def enroll_subject(
+        self, student: Student, subject_name: str
+    ) -> Tuple[Student, Subject]:
         """
         Enroll student in a new subject.
 
@@ -81,6 +91,7 @@ class StudentService:
         self.db.update_student(fresh)
         return (fresh, new_subject)
 
+    # Member 2: Responsible for Subject Enrollment and Grade Calculation
     def remove_subject(self, student: Student, subject_id: str) -> Student:
         """
         Remove a subject from student's enrollment.
@@ -110,6 +121,7 @@ class StudentService:
         self.db.update_student(fresh)
         return fresh
 
+    # Member 1: Responsible for Student Registration and Login
     def change_password(
         self, student: Student, new_password: str, confirm_password: str
     ) -> Student:

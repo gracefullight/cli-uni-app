@@ -19,13 +19,13 @@ from services.student_service import StudentService
 console = Console()
 
 
-# Person C: CLI Interface
 class StudentController:
     """Controller for student operations: register, login, enrollment, password change."""
 
     def __init__(self, student_service: StudentService) -> None:
         self.student_service = student_service
 
+    # Member 1: Responsible for Student Registration and Login
     def register(self) -> None:
         """Register a new student with email/password validation."""
         clear_screen()
@@ -46,6 +46,7 @@ class StudentController:
         except ValueError as e:
             console.print(str(e), style=Colors.ERROR)
 
+    # Member 1: Responsible for Student Registration and Login
     def login(self) -> Optional[Student]:
         """Login with email/password, max 3 attempts."""
         clear_screen()
@@ -65,6 +66,7 @@ class StudentController:
         console.print(ErrorMessages.TOO_MANY_ATTEMPTS, style=Colors.ERROR)
         return None
 
+    # Member 2: Responsible for Subject Enrollment and Grade Calculation
     def view_enrollment(self, student: Student) -> None:
         """Display all enrolled subjects with marks and grades."""
         clear_screen()
@@ -90,6 +92,7 @@ class StudentController:
             )
             console.print(InfoMessages.AVERAGE_STATUS.format(average=avg, status=status))
 
+    # Member 2: Responsible for Subject Enrollment and Grade Calculation
     def enroll_subject(self, student: Student) -> None:
         """Enroll in a new subject (max 4 limit)."""
         clear_screen()
@@ -119,6 +122,7 @@ class StudentController:
         except ValueError as e:
             console.print(str(e), style=Colors.ERROR)
 
+    # Member 2: Responsible for Subject Enrollment and Grade Calculation
     def remove_subject(self, student: Student) -> None:
         """Remove an enrolled subject."""
         clear_screen()
@@ -148,6 +152,7 @@ class StudentController:
         except ValueError as e:
             console.print(str(e), style=Colors.ERROR)
 
+    # Member 1: Responsible for Student Registration and Login
     def change_password(self, student: Student) -> None:
         """Change student password with validation."""
         clear_screen()

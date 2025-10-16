@@ -16,7 +16,7 @@ from services.admin_service import AdminService
 console = Console()
 
 
-# Person C: CLI Interface
+# Member 3: Responsible for the Admin System
 class AdminController:
     """Controller for admin operations: list, remove, group, partition, clear."""
 
@@ -125,7 +125,9 @@ class AdminController:
         """Clear all student data with confirmation."""
         clear_screen()
         console.print(InfoMessages.CLEARING_DATABASE, style=Colors.ERROR)
-        confirm = console.input(f"[{Colors.ERROR}]{Prompts.CONFIRM_CLEAR}[/]").strip().upper()
+        confirm = (
+            console.input(f"[{Colors.ERROR}]{Prompts.CONFIRM_CLEAR}[/]").strip().upper()
+        )
         if confirm == "Y":
             self.admin_service.clear_all_students()
             console.print(SuccessMessages.ALL_CLEARED, style=Colors.WARNING)

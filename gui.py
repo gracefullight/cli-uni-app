@@ -24,6 +24,7 @@ from controllers.gui_student_controller import GUIStudentController
 from services.student_service import StudentService
 
 
+# Member 4: Responsible for GUI Development
 class GuiApp:
     def __init__(self, controller: GUIStudentController) -> None:
         ctk.set_appearance_mode("light")
@@ -47,7 +48,6 @@ class GuiApp:
         for child in self._container.winfo_children():
             child.pack_forget()
 
-    # Person D: GUI Interface - Login Window
     def _build_login_window(self) -> None:
         frame = ctk.CTkFrame(self._container)
 
@@ -80,7 +80,6 @@ class GuiApp:
 
         self._frames["login"] = frame
 
-    # Person D: GUI Interface - Enrollment Window
     def _build_enrollment_window(self) -> None:
         frame = ctk.CTkFrame(self._container)
         self.lbl_enroll_title = ctk.CTkLabel(
@@ -122,7 +121,6 @@ class GuiApp:
 
         self._frames["enrollment"] = frame
 
-    # Person D: GUI Interface - Subject Window
     def _build_subject_window(self) -> None:
         frame = ctk.CTkFrame(self._container)
         ctk.CTkLabel(
@@ -136,7 +134,6 @@ class GuiApp:
         btn_back.pack(pady=8)
         self._frames["subjects"] = frame
 
-    # Person D: GUI Interface - Remove Subject Window
     def _build_remove_subject_window(self) -> None:
         frame = ctk.CTkFrame(self._container)
         ctk.CTkLabel(
@@ -156,7 +153,6 @@ class GuiApp:
         controls.pack(pady=8)
         self._frames["remove_subject"] = frame
 
-    # Person D: GUI Interface - Change Password Window
     def _build_change_password_window(self) -> None:
         frame = ctk.CTkFrame(self._container)
         ctk.CTkLabel(
@@ -180,13 +176,11 @@ class GuiApp:
         btn_back.pack()
         self._frames["change_password"] = frame
 
-    # Person D: GUI Interface - Login Window
     def show_login_window(self) -> None:
         self._clear_container()
         self._frames["login"].pack(fill="both", expand=True)
         self.entry_email.focus()
 
-    # Person D: GUI Interface - Enrollment Window (Main Window after login)
     def show_enrollment_window(self, student=None) -> None:
         if student is not None:
             self.current_student = student
@@ -213,7 +207,6 @@ class GuiApp:
             self.lbl_enroll_title.configure(text=GUIMessages.ENROLLMENT_DEFAULT_TITLE)
             self.lbl_student_info.configure(text="")
 
-    # Person D: GUI Interface - Subject Window
     def show_subject_window(self) -> None:
         for child in self.subjects_holder.winfo_children():
             child.destroy()
@@ -242,7 +235,6 @@ class GuiApp:
         self._clear_container()
         self._frames["subjects"].pack(fill="both", expand=True)
 
-    # Person D: GUI Interface - Remove Subject Window
     def show_remove_subject_window(self) -> None:
         self._clear_container()
         for child in self.remove_list_holder.winfo_children():
@@ -265,14 +257,12 @@ class GuiApp:
             ).pack(anchor="w")
         self._frames["remove_subject"].pack(fill="both", expand=True)
 
-    # Person D: GUI Interface - Change Password Window
     def show_change_password_window(self) -> None:
         self._clear_container()
         self.entry_pw_new.delete(0, "end")
         self.entry_pw_confirm.delete(0, "end")
         self._frames["change_password"].pack(fill="both", expand=True)
 
-    # Person D: GUI Interface
     def _on_login(self) -> None:
         email = self.entry_email.get().strip().lower()
         password = self.entry_password.get().strip()
@@ -284,7 +274,6 @@ class GuiApp:
         except ValueError as e:
             messagebox.showerror(GUIMessages.LOGIN_ERROR, str(e))
 
-    # Person D: GUI Interface - Enrollment Window
     def _on_enroll(self) -> None:
         if self.current_student is None:
             messagebox.showerror(GUIMessages.ENROLL_ERROR, GUIMessages.NO_STUDENT_LOGGED_IN)
@@ -305,7 +294,6 @@ class GuiApp:
         except ValueError as e:
             messagebox.showerror(GUIMessages.ENROLL_ERROR, str(e))
 
-    # Person D: GUI Interface - Remove Subject
     def _on_remove_subject(self) -> None:
         if self.current_student is None:
             messagebox.showerror(GUIMessages.REMOVE_ERROR, GUIMessages.NO_STUDENT_LOGGED_IN)
@@ -323,7 +311,6 @@ class GuiApp:
         except ValueError as e:
             messagebox.showerror(GUIMessages.REMOVE_ERROR, str(e))
 
-    # Person D: GUI Interface - Change Password
     def _on_change_password(self) -> None:
         if self.current_student is None:
             messagebox.showerror(GUIMessages.PASSWORD_ERROR, GUIMessages.NO_STUDENT_LOGGED_IN)
@@ -356,7 +343,7 @@ class GuiApp:
         except Exception:
             pass
 
-
+# Shared responsibility: Application entry point
 def main() -> None:
     db = Database()
     student_service = StudentService(db)

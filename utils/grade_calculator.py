@@ -3,7 +3,7 @@
 from constants import Grades
 
 
-# Person A: Models & Utils (Data Layer)
+# Member 2: Responsible for Subject Enrollment and Grade Calculation
 def calculate_grade(mark: int) -> str:
     """Return grade string based on mark."""
     if mark >= Grades.THRESHOLDS[Grades.HD]:
