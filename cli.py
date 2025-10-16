@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 from rich.console import Console
-from utils.cmd import clear_screen, pause
+from utils.cmd import clear_screen
 from utils.password import validate_email, validate_password, hash_password, check_password
 from models.student import Student
 from models.subject import Subject
@@ -44,7 +44,7 @@ class CLI:
                 return
             else:
                 console.print("Invalid option. Try again.", style="red")
-                pause()
+                
 
     def menu_student(self) -> None:
         # Student system prompt (l/r/x) - login/register/back
@@ -62,7 +62,7 @@ class CLI:
                 break
             else:
                 console.print("Invalid student option. Try again.", style="red")
-                pause()
+                
 
     def menu_admin(self) -> None:
         clear_screen()
@@ -85,7 +85,7 @@ class CLI:
                 break
             else:
                 console.print("Invalid admin option. Try again.", style="red")
-                pause()
+                
 
     def menu_subject_enrollment(self, student: Student) -> None:
         while True:
@@ -104,7 +104,7 @@ class CLI:
                 return
             else:
                 console.print("Invalid option. Try again.", style="red")
-                pause()
+                
 
     # ------------------------- Student Flows -------------------------
     def student_register(self) -> None:
@@ -118,22 +118,22 @@ class CLI:
         # Validations
         if not validate_email(email):
             console.print("Error: Invalid email format. Expected firstname.lastname@university.com", style="red")
-            pause()
+            
             return
         if not validate_password(password):
             console.print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits", style="red")
-            pause()
+            
             return
         # Enforce that email components match provided names
         try:
             fname_part, lname_part = email.split("@")[0].split(".")
         except ValueError:
             console.print("Error: Invalid email format components.", style="red")
-            pause()
+            
             return
         if fname_part != first_name.lower() or lname_part != last_name.lower():
             console.print("Error: Email name parts must match first and last name provided.", style="red")
-            pause()
+            
             return
 
         ok, msg, _student = self.db.add_student(first_name, last_name, email, password)
@@ -141,7 +141,7 @@ class CLI:
             console.print(msg, style="red")
         else:
             print(msg)
-        pause()
+        
 
     def student_login(self) -> Optional[Student]:
         clear_screen()
@@ -158,7 +158,7 @@ class CLI:
             student = self.db.get_student_by_email(email)
             if not student or not check_password(password, student.password):
                 console.print("Error: Invalid email or password.", style="red")
-                pause()
+                
                 return None
             return student
         console.print("Too many failed attempts.", style="red")
@@ -175,24 +175,23 @@ class CLI:
             avg = student.average_mark()
             status = "PASS" if student.is_passing() else "FAIL"
             console.print(f"Average: {avg:.2f} ({status})")
-        pause()
+        
 
     def student_enroll_subject(self, student: Student) -> None:
         clear_screen()
         console.print("------ Enroll in Subject ------", style="yellow")
         if len(student.subjects) >= MAX_SUBJECTS_PER_STUDENT:
             console.print(f"Error: Subject limit reached ({MAX_SUBJECTS_PER_STUDENT}).", style="red")
-            pause()
             return
         name = input("Subject name: ").strip()
         if not name:
             console.print("Error: Subject name cannot be empty.", style="red")
-            pause()
+            
             return
         # Prevent duplicate subject names for the same student
         if any(s.name.lower() == name.lower() for s in student.subjects):
             console.print("Error: Already enrolled in a subject with this name.", style="red")
-            pause()
+            
             return
         existing_ids = {s.subject_id for s in student.subjects}
         subject = Subject.create(name=name, existing_ids=existing_ids)
@@ -200,13 +199,12 @@ class CLI:
         self.db.update_student(student)
         console.print(f"Success: Enrolled in {subject.name} with Subject ID {subject.subject_id}. Mark: {subject.mark}, Grade: {subject.grade}")
         console.print(f"You are now enrolled in {len(student.subjects)} out of {MAX_SUBJECTS_PER_STUDENT} subjects.", style="yellow")
-        pause()
+        
 
     def student_remove_subject(self, student: Student) -> None:
         clear_screen()
         if not student.subjects:
             console.print("No subjects to remove.", style="red")
-            pause()
             return
         for s in student.subjects:
             console.print(f"[{s.subject_id}] {s.name}")
@@ -219,7 +217,6 @@ class CLI:
                 console.print(f"You are now enrolled in {len(student.subjects)} out of {MAX_SUBJECTS_PER_STUDENT} subjects.", style="yellow")
                 return
         console.print("Error: Subject not found.", style="red")
-        pause()
 
     def student_change_password(self, student: Student) -> None:
         clear_screen()
@@ -227,7 +224,7 @@ class CLI:
         new_password = console.input("New password: ", password=True).strip()
         if not validate_password(new_password):
             console.print("Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits", style="red")
-            pause()
+            
             return
         confirm_password = console.input("Confirm password: ", password=True).strip()
         if new_password != confirm_password:
@@ -237,7 +234,7 @@ class CLI:
         student.password = hash_password(new_password)
         self.db.update_student(student)
         console.print("Success: Password changed.", style="green")
-        pause()
+        
 
     # ------------------------- Admin Flows -------------------------
     def admin_list_students(self) -> None:
@@ -246,14 +243,14 @@ class CLI:
         students = self.db.list_students()
         if not students:
             console.print("No students found.", style="red")
-            pause()
+            
             return
 
         for s in students:
             avg = s.average_mark()
             status = "PASS" if s.is_passing() else "FAIL"
             print(f"{s.student_id} | {s.first_name} {s.last_name} | {s.email} | Subjects: {len(s.subjects)} | Avg: {avg:.2f} ({status})")
-        pause()
+        
 
     def admin_remove_student(self) -> None:
         clear_screen()
@@ -264,7 +261,7 @@ class CLI:
             console.print(msg, style="red")
         else:
             print(msg)
-        pause()
+        
 
     def admin_group_by_grade(self) -> None:
         clear_screen()
@@ -272,7 +269,7 @@ class CLI:
         students = self.db.list_students()
         if not students:
             console.print("<Nothing to Display>")
-            pause()
+            
             return
         # Determine dominant grade per student as the highest grade across subjects; if no subjects, 'N/A'
         grade_order = {"HD": 4, "D": 3, "C": 2, "P": 1, "F": 0}
@@ -290,7 +287,7 @@ class CLI:
             else:
                 for m in members:
                     print(f"  {m.student_id} | {m.first_name} {m.last_name} | Avg {m.average_mark():.2f}")
-        pause()
+        
 
     def admin_partition_pass_fail(self) -> None:
         clear_screen()
@@ -298,7 +295,7 @@ class CLI:
         students = self.db.list_students()
         if not students:
             console.print("No students to partition.", style="red")
-            pause()
+            
             return
         passed = [s for s in students if s.is_passing()]
         failed = [s for s in students if not s.is_passing()]
@@ -314,7 +311,7 @@ class CLI:
         else:
             for s in failed:
                 console.print(f"  {s.student_id} | {s.first_name} {s.last_name} | Avg {s.average_mark():.2f}")
-        pause()
+        
 
     def admin_clear_all(self) -> None:
         clear_screen()
@@ -325,7 +322,7 @@ class CLI:
             console.print("Success: All student data cleared.", style="yellow")
         else:
             console.print("Operation cancelled.", style="red")
-        pause()
+        
 
 
 def main() -> None:

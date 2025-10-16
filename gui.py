@@ -14,9 +14,11 @@ from __future__ import annotations
 
 import tkinter as tk
 from tkinter import messagebox
+from typing import Optional
 
 from db import Database
 from models.subject import Subject
+from models.student import Student
 from utils.password import validate_email, validate_password, hash_password, check_password
 
 
@@ -25,7 +27,7 @@ class App:
         self.root = tk.Tk()
         self.root.title("GUIUniApp")
         self.db = Database()
-        self.current_student = None
+        self.current_student: Optional[Student] = None
         self._container = tk.Frame(self.root)
         self._container.pack(fill=tk.BOTH, expand=True)
         self._frames = {}
