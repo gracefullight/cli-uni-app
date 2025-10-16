@@ -16,7 +16,7 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 
-from cliuniapp import (
+from cli import (
     Database,
     Subject,
     validate_email,

@@ -1,0 +1,10 @@
+[project]
+name = "CLIUniApp"
+version = "0.1.0"
+description = "A university management system with CLI and GUI interfaces for students and admins."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    {name = "Group Members"},
+]
+dependencies = []
