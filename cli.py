@@ -18,7 +18,8 @@ from messages import (
     Colors,
 )
 from utils.cmd import clear_screen
-from controllers import StudentController, AdminController
+from controllers.student_controller import StudentController
+from controllers.admin_controller import AdminController
 from db import Database
 from services.student_service import StudentService
 from services.admin_service import AdminService
