@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from models.student import Student
 from utils.password import hash_password
@@ -28,7 +28,7 @@ class Database:
         students = [Student.from_dict(d) for d in data]
         return students
 
-    def _write_all(self, students: Iterable[Student | Dict[str, Any]]) -> None:
+    def _write_all(self, students: Iterable[Union[Student, Dict[str, Any]]]) -> None:
         serializable = [s.to_dict() if isinstance(s, Student) else s for s in students]
         with open(self.filepath, "w", encoding="utf-8") as f:
             json.dump(serializable, f, indent=2)
