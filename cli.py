@@ -39,7 +39,6 @@ class CliApp:
     def run(self) -> None:
         while True:
             clear_screen()
-            console.print(InfoMessages.UNIVERSITY_SYSTEM, style=Colors.HEADER)
             choice = console.input(f"[{Colors.HEADER}]{Prompts.UNIVERSITY}[/]").strip().lower()
             if choice == "a":
                 self.menu_admin()
@@ -70,10 +69,8 @@ class CliApp:
 
     # Member 3: Responsible for the Admin System
     def menu_admin(self) -> None:
-        clear_screen()
         while True:
-            console.print(InfoMessages.ADMIN_SYSTEM, style=Colors.HEADER)
-            admin_choice = console.input(f"[{Colors.HEADER}]{Prompts.ADMIN_MENU}[/]").strip().lower()
+            admin_choice = console.input(f"[{Colors.HEADER}]\t{InfoMessages.ADMIN_SYSTEM}[/]").strip().lower()
             if admin_choice == "c":
                 self.admin_controller.clear_all()
             elif admin_choice == "g":

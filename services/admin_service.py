@@ -3,6 +3,7 @@
 from typing import Dict, List, Tuple
 
 from constants import Grades
+from utils.grade_calculator import calculate_grade
 from models.student import Student
 from db import Database
 
@@ -30,10 +31,9 @@ class AdminService:
         for s in students:
             if not s.subjects:
                 continue
-            best = max(
-                (subj.grade for subj in s.subjects), key=lambda g: Grades.ORDER.get(g, -1)
-            )
-            groups[best].append(s)
+            grade = s.get_grade()
+
+            groups[grade].append(s)
         return groups
 
     def partition_pass_fail(self) -> Tuple[List[Student], List[Student]]:

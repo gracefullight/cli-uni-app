@@ -6,6 +6,7 @@ from typing import Dict, List
 from .subject import Subject
 from constants import PASSING_AVERAGE
 from utils.id_generator import generate_unique_id
+from utils.grade_calculator import calculate_grade
 
 
 # Member 1: Responsible for Student Registration and Login
@@ -57,3 +58,6 @@ class Student:
     # Member 2: Responsible for Subject Enrollment and Grade Calculation
     def is_passing(self) -> bool:
         return self.average_mark() >= PASSING_AVERAGE
+
+    def get_grade(self) -> str:
+        return calculate_grade(self.average_mark())

@@ -9,7 +9,7 @@ class Prompts:
     """User input prompts"""
     
     # University System
-    UNIVERSITY = "University System: (A)dmin, (S)tudent, or [X] : "
+    UNIVERSITY = "University System: (A)dmin, (S)tudent, or X : "
     
     # Student System
     STUDENT_MENU = "Student System: [L]ogin, [R]egister, or X): "
@@ -37,8 +37,8 @@ class Prompts:
     SUBJECT_ID_TO_REMOVE = "Enter Subject ID to remove: "
     
     # Admin
-    STUDENT_ID_TO_REMOVE = "Enter Student ID to remove: "
-    CONFIRM_CLEAR = "Are you sure you want to clear the database (Y)ES/(N)O?: "
+    STUDENT_ID_TO_REMOVE = "\tRemove by ID: "
+    CONFIRM_CLEAR = "Are you sure you want to clear the database (Y)ES/(N)O: "
     
     # Password Change
     NEW_PASSWORD = "New password: "
@@ -66,9 +66,7 @@ class SuccessMessages:
     PASSWORD_CHANGED = "Success: Password changed."
     
     # Admin
-    STUDENT_REMOVED = "Success: Student removed."
-    ALL_CLEARED = "Success: All student data cleared."
-    OPERATION_CANCELLED = "Operation cancelled."
+    ALL_CLEARED = "Students data cleared."
 
 
 # ======================== Error Messages ========================
@@ -103,7 +101,6 @@ class ErrorMessages:
     
     # Admin Errors
     STUDENT_NOT_FOUND = "Error: Student not found."
-    NO_STUDENTS_FOUND = "No students found."
     
     # General Errors
     INVALID_OPTION = "Invalid option. Try again."
@@ -116,13 +113,12 @@ class InfoMessages:
     """Informational message templates"""
     
     # Headers
-    UNIVERSITY_SYSTEM = "The University System"
+    UNIVERSITY_SYSTEM = "University System"
     STUDENT_SIGN_UP = "Student Sign Up"
     STUDENT_SIGN_IN = "Student Sign In"
-    ADMIN_SYSTEM = "Admin System:"
+    ADMIN_SYSTEM = "Admin System (c/g/p/r/s/x): "
     ENROLL_IN_SUBJECT = "------ Enroll in Subject ------"
     STUDENT_LIST = "Student List"
-    REMOVE_STUDENT = "Remove Student"
     GRADE_GROUPING = "Grade Grouping"
     PASS_FAIL_PARTITION = "PASS/FAIL Partition"
     CLEARING_DATABASE = "Clearing students database"
@@ -138,13 +134,7 @@ class InfoMessages:
     AVERAGE_STATUS = "Average: {average:.2f} ({status})"
     
     # Admin Display
-    NOTHING_TO_DISPLAY = "<Nothing to Display>"
-    NO_STUDENTS_TO_PARTITION = "No students to partition."
-    
-    # Grade Labels
-    GRADE_LABEL = "Grade {grade}:"
-    PASS_LABEL = "PASS:"
-    FAIL_LABEL = "FAIL:"
+    NOTHING_TO_DISPLAY = "< Nothing to Display >"
     
     # Status
     STATUS_PASS = "PASS"
@@ -166,8 +156,8 @@ class FormatTemplates:
     SUBJECT_LIST_ITEM = "[{subject_id}] {name}"
     
     # Student Display
-    STUDENT_DETAIL = "{student_id} | {first_name} {last_name} | {email} | Subjects: {subject_count} | Avg: {average:.2f} ({status})"
-    STUDENT_SUMMARY = "  {student_id} | {first_name} {last_name} | Avg {average:.2f}"
+    STUDENT_DETAIL = "{first_name} {last_name} :: {student_id} --> Email: {email}"
+    STUDENT_SUMMARY = "{first_name} {last_name} :: {student_id} --> GRADE: {grade} - MARK: {average:.2f}"
     
     # GUI
     GUI_ENROLLMENT_TITLE = "Enrollment - {first_name} {last_name} ({student_id})"

@@ -5,16 +5,14 @@ from rich.console import Console
 from messages import (
     Prompts,
     SuccessMessages,
-    ErrorMessages,
     InfoMessages,
     FormatTemplates,
     Colors,
 )
-from utils.cmd import clear_screen
 from services.admin_service import AdminService
+from utils.grade_calculator import calculate_grade
 
 console = Console()
-
 
 # Member 3: Responsible for the Admin System
 class AdminController:
@@ -25,111 +23,98 @@ class AdminController:
 
     def list_students(self) -> None:
         """List all students with their statistics."""
-        clear_screen()
-        console.print(InfoMessages.STUDENT_LIST, style=Colors.WARNING)
+        console.print(f"\t{InfoMessages.STUDENT_LIST}", style=Colors.WARNING)
         students = self.admin_service.list_students()
         if not students:
-            console.print(ErrorMessages.NO_STUDENTS_FOUND, style=Colors.ERROR)
+            console.print(f"\t\t{InfoMessages.NOTHING_TO_DISPLAY}")
             return
 
         for s in students:
-            avg = s.average_mark()
-            status = InfoMessages.STATUS_PASS if s.is_passing() else InfoMessages.STATUS_FAIL
-            console.print(
-                FormatTemplates.STUDENT_DETAIL.format(
+            formatted_student = FormatTemplates.STUDENT_DETAIL.format(
                     student_id=s.student_id,
                     first_name=s.first_name,
                     last_name=s.last_name,
                     email=s.email,
-                    subject_count=len(s.subjects),
-                    average=avg,
-                    status=status,
                 )
-            )
+            console.print(f"\t{formatted_student}")
 
     def remove_student(self) -> None:
         """Remove a student by ID."""
-        clear_screen()
-        console.print(InfoMessages.REMOVE_STUDENT, style=Colors.ERROR)
         student_id = console.input(Prompts.STUDENT_ID_TO_REMOVE).strip()
         ok, msg = self.admin_service.remove_student(student_id)
         if not ok:
-            console.print(msg, style=Colors.ERROR)
+            console.print(f"\tStudent {student_id} does not exist", style=Colors.ERROR)
         else:
-            console.print(msg)
+            console.print(f"\tRemoving Student {student_id} Account", style=Colors.WARNING)
 
     def group_by_grade(self) -> None:
         """Group students by their dominant grade."""
-        clear_screen()
-        console.print(InfoMessages.GRADE_GROUPING, style=Colors.WARNING)
+        console.print(f"\t{InfoMessages.GRADE_GROUPING}", style=Colors.WARNING)
         groups = self.admin_service.group_by_grade()
 
         if not any(groups.values()):
-            console.print(InfoMessages.NOTHING_TO_DISPLAY)
+            console.print(f"\t\t{InfoMessages.NOTHING_TO_DISPLAY}", style=Colors.WARNING)
             return
 
         for grade, members in groups.items():
-            console.print(InfoMessages.GRADE_LABEL.format(grade=grade), style=Colors.WARNING)
-            if not members:
-                console.print(InfoMessages.NOTHING_TO_DISPLAY)
-            else:
+            if members:
+                summaries = []
                 for m in members:
-                    console.print(
+                    summaries.append(
                         FormatTemplates.STUDENT_SUMMARY.format(
                             student_id=m.student_id,
                             first_name=m.first_name,
                             last_name=m.last_name,
                             average=m.average_mark(),
+                            grade=m.get_grade(),
                         )
                     )
 
+                joined = ", ".join(summaries)
+                console.print(f"\t{grade} --> [{joined}]")
+
     def partition_pass_fail(self) -> None:
         """Partition students into pass/fail groups."""
-        clear_screen()
-        console.print(InfoMessages.PASS_FAIL_PARTITION, style=Colors.WARNING)
+        console.print(f"\t{InfoMessages.PASS_FAIL_PARTITION}", style=Colors.WARNING)
         passed, failed = self.admin_service.partition_pass_fail()
 
-        if not passed and not failed:
-            console.print(InfoMessages.NO_STUDENTS_TO_PARTITION, style=Colors.ERROR)
-            return
-
-        console.print(InfoMessages.PASS_LABEL, style=Colors.SUCCESS)
-        if not passed:
-            console.print(InfoMessages.NOTHING_TO_DISPLAY)
-        else:
-            for s in passed:
-                console.print(
-                    FormatTemplates.STUDENT_SUMMARY.format(
-                        student_id=s.student_id,
-                        first_name=s.first_name,
-                        last_name=s.last_name,
-                        average=s.average_mark(),
-                    )
+        failed_summaries: list[str] = []
+        for s in failed:
+            failed_summaries.append(
+                FormatTemplates.STUDENT_SUMMARY.format(
+                    student_id=s.student_id,
+                    first_name=s.first_name,
+                    last_name=s.last_name,
+                    average=s.average_mark(),
+                    grade=s.get_grade(),
                 )
+            )
 
-        console.print(InfoMessages.FAIL_LABEL, style=Colors.ERROR)
-        if not failed:
-            console.print(InfoMessages.NOTHING_TO_DISPLAY)
-        else:
-            for s in failed:
-                console.print(
-                    FormatTemplates.STUDENT_SUMMARY.format(
-                        student_id=s.student_id,
-                        first_name=s.first_name,
-                        last_name=s.last_name,
-                        average=s.average_mark(),
-                    )
+        joined_failed = ", ".join(failed_summaries)
+        console.print(f"\t{InfoMessages.STATUS_FAIL} --> [{joined_failed}]")
+
+        passed_summaries: list[str] = []
+        for s in passed:
+            passed_summaries.append(
+                FormatTemplates.STUDENT_SUMMARY.format(
+                    student_id=s.student_id,
+                    first_name=s.first_name,
+                    last_name=s.last_name,
+                    average=s.average_mark(),
+                    grade=s.get_grade(),
                 )
+            )
+
+        joined_passed = ", ".join(passed_summaries)
+        console.print(f"\t{InfoMessages.STATUS_PASS} --> [{joined_passed}]")
 
     def clear_all(self) -> None:
         """Clear all student data with confirmation."""
-        clear_screen()
-        console.print(InfoMessages.CLEARING_DATABASE, style=Colors.ERROR)
+        console.print(f"\t{InfoMessages.CLEARING_DATABASE}", style=Colors.WARNING)
         confirm = (
-            console.input(f"[{Colors.ERROR}]{Prompts.CONFIRM_CLEAR}[/]").strip().upper()
+            console.input(f"[{Colors.ERROR}]\t{Prompts.CONFIRM_CLEAR}[/]").strip().upper()
         )
+
         if confirm == "Y":
             self.admin_service.clear_all_students()
-            console.print(SuccessMessages.ALL_CLEARED, style=Colors.WARNING)
-        else:
-            console.print(SuccessMessages.OPERATION_CANCELLED, style=Colors.ERROR)
+            console.print(f"\t{SuccessMessages.ALL_CLEARED}", style=Colors.WARNING)
