@@ -12,9 +12,6 @@ from utils.password import (
 from models.student import Student
 from models.subject import Subject
 from db import Database
-from rich.console import Console
-
-console = Console()
 
 
 class StudentService:
@@ -29,15 +26,13 @@ class StudentService:
     ) -> Tuple[bool, str, Optional[Student]]:
         """Register a new student with email/password validation."""
         if not validate_email(email):
-            return False, "Incorrect email or password format", None
+            return False, "Invalid email format", None
         if not validate_password(password):
-            return False, "Incorrect email or password format", None
-
+            return False, "Invalid password format", None
         try:
             fname_part, lname_part = email.split("@")[0].split(".")
         except ValueError:
             return False, "Invalid email components", None
-
         if fname_part != first_name.lower() or lname_part != last_name.lower():
             return False, "Email and name do not match", None
 
@@ -57,16 +52,11 @@ class StudentService:
             raise ValueError("Email and password are required")
 
         if not validate_email(email) or not validate_password(password):
-            raise ValueError("Incorrect email or password format")
-
-        console.print("Email and password formats acceptable.", style="yellow")
+            raise ValueError("Invalid email or password format")
 
         student = self.db.get_student_by_email(email.lower())
-        if student is None:
-            raise ValueError("Student does not exist.")
-
-        if not check_password(password, student.password):
-            raise ValueError("Incorrect email or password format")
+        if student is None or not check_password(password, student.password):
+            raise ValueError("Invalid email or password")
 
         return student
 
@@ -123,6 +113,7 @@ class StudentService:
             if s.subject_id == subject_id:
                 del fresh.subjects[idx]
                 removed = True
+                break
 
         if not removed:
             raise ValueError("Subject not found")
