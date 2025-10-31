@@ -59,6 +59,7 @@ class SuccessMessages:
     
     # Subject Removal
     REMOVE_SUBJECT = "Dropping Subject - {subject_id}"
+    PASSWORD_CHANGED = "Password updated successfully!"
     
     
     # Admin

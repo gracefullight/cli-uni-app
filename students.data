@@ -64,7 +64,14 @@
     "first_name": "Rithvik",
     "last_name": "Gali",
     "email": "rithvik.gali@university.com",
-    "password": "$2b$12$tjs.CQGD/L6dZJL8Gm9ht.TwJCb4LslnEcijMY2j5uohA607NPEze",
-    "subjects": []
+    "password": "$2b$12$Ke93G3JLeyelOf67kGZpy.P8UaEWD338U1Ucx7nZUqPhGLbLMAg6a",
+    "subjects": [
+      {
+        "subject_id": "162",
+        "name": "English",
+        "mark": 100,
+        "grade": "HD"
+      }
+    ]
   }
 ]
