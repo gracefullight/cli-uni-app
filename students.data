@@ -8,25 +8,21 @@
     "subjects": [
       {
         "subject_id": "475",
-        "name": "Subject 1",
         "mark": 15,
         "grade": "F"
       },
       {
         "subject_id": "151",
-        "name": "Subject 2",
         "mark": 14,
         "grade": "F"
       },
       {
         "subject_id": "749",
-        "name": "Subject 3",
         "mark": 59,
         "grade": "P"
       },
       {
         "subject_id": "314",
-        "name": "Subject 4",
         "mark": 97,
         "grade": "HD"
       }
@@ -118,6 +114,22 @@
     "last_name": "tom",
     "email": "tom.tom@university.com",
     "password": "$2b$12$g4tZjePsuGgOZ9IBPquzJO/j5oE8VXPeCasUbygfouGTSF57haqr6",
-    "subjects": []
+    "subjects": [
+      {
+        "subject_id": "307",
+        "mark": 79,
+        "grade": "D"
+      },
+      {
+        "subject_id": "263",
+        "mark": 12,
+        "grade": "F"
+      },
+      {
+        "subject_id": "225",
+        "mark": 86,
+        "grade": "HD"
+      }
+    ]
   }
 ]

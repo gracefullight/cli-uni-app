@@ -72,7 +72,7 @@ class StudentService:
 
     # Member 2: Responsible for Subject Enrollment and Grade Calculation
     def enroll_subject(
-        self, student: Student, subject_name: str
+        self, student: Student
     ) -> Tuple[Student, Subject]:
         """
         Enroll student in a new subject.
@@ -90,15 +90,13 @@ class StudentService:
             raise ValueError(
                 f"Students can enroll in {MAX_SUBJECTS_PER_STUDENT} subjects only"
             )
-
-        if any(s.name.lower() == subject_name.lower() for s in fresh.subjects):
-            raise ValueError("Subject with this name already exists")
-
         existing_ids = {s.subject_id for s in fresh.subjects}
-        new_subject = Subject.create(name=subject_name, existing_ids=existing_ids)
+        new_subject = Subject.create(existing_ids=existing_ids)
         fresh.subjects.append(new_subject)
 
         self.db.update_student(fresh)
+        student.subjects = fresh.subjects
+
         return (fresh, new_subject)
 
     # Member 2: Responsible for Subject Enrollment and Grade Calculation
@@ -128,6 +126,8 @@ class StudentService:
             raise ValueError("Subject not found")
 
         self.db.update_student(fresh)
+        student.subjects = fresh.subjects
+
         return fresh
 
     # Member 1: Responsible for Student Registration and Login
@@ -143,7 +143,7 @@ class StudentService:
             ValueError with error message if password change fails
         """
         if new_password != confirm_password:
-            raise ValueError("Passwords do not match")
+            raise ValueError("Passwords do not match - try again.")
 
         if not validate_password(new_password):
             raise ValueError("Incorrect password format")
@@ -154,5 +154,6 @@ class StudentService:
 
         fresh.password = hash_password(new_password)
         self.db.update_student(fresh)
+        student.password = fresh.password
 
         return fresh

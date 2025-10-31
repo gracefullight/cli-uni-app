@@ -38,7 +38,6 @@ class CliApp:
     # Member 1: Responsible for the main application flow
     def run(self) -> None:
         while True:
-            clear_screen()
             choice = console.input(f"[{Colors.HEADER}]{Prompts.UNIVERSITY}[/]").strip().lower()
             if choice == "a":
                 self.menu_admin()
@@ -57,7 +56,7 @@ class CliApp:
             if student_choice == "l":
                 student = self.student_controller.login()
                 if student:
-                    console.print(SuccessMessages.LOGIN.format(first_name=student.first_name), style=Colors.SUCCESS)
+                    console.print(f"\t{SuccessMessages.LOGIN.format(first_name=student.first_name)}", style=Colors.SUCCESS)
                     self.menu_subject_enrollment(student)
             elif student_choice == "r":
                 self.student_controller.register()
@@ -88,13 +87,7 @@ class CliApp:
     # Member 2: Responsible for Subject Enrollment
     def menu_subject_enrollment(self, student) -> None:
         while True:
-            console.print(InfoMessages.STUDENT_COURSE_MENU.format(
-                first_name=student.first_name, 
-                last_name=student.last_name, 
-                student_id=student.student_id
-            ), style=Colors.HEADER)
-            console.print(InfoMessages.COURSE_MENU_OPTIONS, style=Colors.HEADER)
-            choice = console.input(Prompts.ENROLLMENT_OPTIONS).strip().lower()
+            choice = console.input(f"[{Colors.HEADER}]\t{InfoMessages.STUDENT_COURSE_MENU}[/]").strip().lower()
             if choice == "c":
                 self.student_controller.change_password(student)
             elif choice == "e":

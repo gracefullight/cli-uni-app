@@ -22,8 +22,7 @@ class Prompts:
     LOGIN_PASSWORD = "Password: "
     
     # Subject
-    SUBJECT_NAME = "Subject name: "
-    SUBJECT_ID_TO_REMOVE = "Enter Subject ID to remove: "
+    SUBJECT_ID_TO_REMOVE = "Remove Subject by ID: "
     
     # Admin
     STUDENT_ID_TO_REMOVE = "\tRemove by ID: "
@@ -45,14 +44,14 @@ class SuccessMessages:
     LOGIN = "Welcome, {first_name}!"
     
     # Enrollment
-    ENROLL = "Success: Enrolled in {subject_name} with Subject ID {subject_id}. Mark: {mark}, Grade: {grade}"
+    ENROLL = "Enrolling in Subject-{subject_id}"
     ENROLL_COUNT = "You are now enrolled in {count} out of {max_subjects} subjects."
     
     # Subject Removal
-    REMOVE_SUBJECT = "Dropping subject {subject_id}"
+    REMOVE_SUBJECT = "Dropping Subject-{subject_id}"
     
     # Password
-    PASSWORD_CHANGED = "Success: Password changed."
+    PASSWORD_CHANGED = "Password changed."
     
     # Admin
     ALL_CLEARED = "Students data cleared."
@@ -69,7 +68,6 @@ class ErrorMessages:
     TOO_MANY_ATTEMPTS = "Too many failed attempts."
 
     # Subject Errors
-    SUBJECT_NAME_EMPTY = "Error: Subject name cannot be empty."
     NO_SUBJECTS_TO_REMOVE = "No subjects to remove."
 
     # General Errors
@@ -93,8 +91,7 @@ class InfoMessages:
     UPDATING_PASSWORD = "Updating Password"
     
     # Subject Menu
-    STUDENT_COURSE_MENU = "Student Course Menu ({first_name} {last_name} | ID: {student_id})"
-    COURSE_MENU_OPTIONS = "[C]hange Password, [E]nroll Subject, [R]emove Subject, [S]how Enrollment, or [X]"
+    STUDENT_COURSE_MENU = "Student Course Menu (c/e/r/s/x): "
     
     # Subject Display
     SHOWING_SUBJECTS = "Showing {count} subjects"
@@ -117,7 +114,7 @@ class FormatTemplates:
     """Output format templates"""
     
     # Subject Display
-    SUBJECT_ITEM = "[{subject_id}] {name} - Mark: {mark}, Grade: {grade}"
+    SUBJECT_ITEM = "[ Subject::{subject_id} -- Mark = {mark} -- Grade = {grade:>3} ]"
     SUBJECT_LIST_ITEM = "[{subject_id}] {name}"
     
     # Student Display
