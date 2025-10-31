@@ -7,24 +7,16 @@ All user-facing prompts, success/error messages, and format templates.
 # ======================== Prompts ========================
 class Prompts:
     """User input prompts"""
-    
+
     # University System
     UNIVERSITY = "University System: (A)dmin, (S)tudent, or X : "
-    
+
     # Student System
     STUDENT_MENU = "Student System: (l/r/x): "
-    
+
     # Enrollment System
     ENROLLMENT_OPTIONS = "Select an option: "
-    
-    # Registration
-    FIRST_NAME = "First name: "
-    LAST_NAME = "Last name: "
-    EMAIL = "Email (firstname.lastname@university.com): "
-    PASSWORD = "Password (Start uppercase, 5+ letters, end with 3 digits): "
-    NAME = "Name (First Last): "
 
-    
     # Login
     LOGIN_EMAIL = "Email: "
     LOGIN_PASSWORD = "Password: "
@@ -70,38 +62,18 @@ class SuccessMessages:
 class ErrorMessages:
     """Error message templates"""
     
-    # Validation Errors
-    INVALID_EMAIL_FORMAT = "Incorrect email or password format. Expected firstname.lastname@university.com"
-    INVALID_PASSWORD_FORMAT = "Incorrect email or password format. Must start uppercase, 5+ letters, end with 3 digits"
-    EMAIL_NAME_MISMATCH = "Error: Email name parts must match first and last name provided."
-    INVALID_EMAIL_COMPONENTS = "Error: Invalid email format components."
-    
     # Registration Errors
     EMAIL_ALREADY_REGISTERED = "Student {first_name} {last_name} already exists."
     
     # Login Errors
-    INCORRECT_FORMAT = "Incorrect email or password format"
-    INVALID_CREDENTIALS = "Error: Invalid email or password."
     TOO_MANY_ATTEMPTS = "Too many failed attempts."
-    STUDENT_NOT_FOUND_LOGIN = "Student does not exist."
-
 
     # Subject Errors
-    SUBJECT_LIMIT_REACHED = "Error: Subject limit reached ({max_subjects})."
     SUBJECT_NAME_EMPTY = "Error: Subject name cannot be empty."
-    SUBJECT_ALREADY_ENROLLED = "Error: Already enrolled in a subject with this name."
-    SUBJECT_NOT_FOUND = "Error: Subject not found."
     NO_SUBJECTS_TO_REMOVE = "No subjects to remove."
-    
-    # Password Errors
-    PASSWORD_MISMATCH = "Error: Password does not match."
-    
-    # Admin Errors
-    STUDENT_NOT_FOUND = "Error: Student not found."
-    
+
     # General Errors
     INVALID_OPTION = "Invalid option. Try again."
-    INVALID_STUDENT_OPTION = "Invalid student option. Try again."
     INVALID_ADMIN_OPTION = "Invalid admin option. Try again."
 
 
@@ -110,7 +82,6 @@ class InfoMessages:
     """Informational message templates"""
     
     # Headers
-    UNIVERSITY_SYSTEM = "University System"
     STUDENT_SIGN_UP = "Student Sign Up"
     STUDENT_SIGN_IN = "Student Sign In"
     ADMIN_SYSTEM = "Admin System (c/g/p/r/s/x): "
@@ -136,9 +107,6 @@ class InfoMessages:
     # Status
     STATUS_PASS = "PASS"
     STATUS_FAIL = "FAIL"
-    
-    # Format validation
-    FORMAT_OK = "Email and password formats acceptable."
 
     # Exit
     THANK_YOU = "Thank You"
@@ -193,12 +161,7 @@ class GUIMessages:
     BACK_BUTTON = "Back"
     REMOVE_BUTTON = "Remove"
     SAVE_BUTTON = "Save"
-    
-    # Table Headers
-    SUBJECT_HEADER = "Subject"
-    MARK_HEADER = "Mark"
-    GRADE_HEADER = "Grade"
-    
+
     # Error Dialog Titles
     LOGIN_ERROR = "Login Error"
     ENROLL_ERROR = "Enroll Error"
@@ -206,16 +169,7 @@ class GUIMessages:
     PASSWORD_ERROR = "Password Error"
     
     # Error Messages
-    EMAIL_PASSWORD_REQUIRED = "Email and password are required."
-    INVALID_FORMAT = "Invalid email or password format."
-    INVALID_CREDENTIALS = "Invalid credentials or unregistered user."
     NO_STUDENT_LOGGED_IN = "No student logged in."
-    STUDENT_NOT_FOUND_GUI = "Student not found."
-    MAX_SUBJECTS_EXCEEDED = "Maximum of 4 subjects exceeded."
-    SELECT_SUBJECT_TO_REMOVE = "Please select a subject to remove."
-    SUBJECT_NOT_FOUND_GUI = "Subject not found."
-    PASSWORDS_DO_NOT_MATCH = "New passwords do not match."
-    INVALID_PASSWORD_FORMAT_GUI = "Invalid password format."
     
     # Success Messages
     ENROLL_SUCCESS = "Enrolled in {name} (ID {subject_id}) with mark {mark} and grade {grade}."
@@ -226,7 +180,6 @@ class GUIMessages:
     NO_SUBJECTS_GUI = "No subjects enrolled."
     NO_SUBJECTS_TO_REMOVE_GUI = "No subjects to remove."
     ENROLLMENT_DEFAULT_TITLE = "Enrollment"
-    SUBJECT_DEFAULT_NAME = "Subject {number}"
 
 
 # ======================== Color Styles (for rich console) ========================
