@@ -99,7 +99,7 @@ class CliApp:
                 self.student_controller.change_password(student)
             elif choice == "e":
                 self.student_controller.enroll_subject(student)
-            elif choice == "r"
+            elif choice == "r":
                 self.student_controller.remove_subject(student)
             elif choice == "s":
                 self.student_controller.view_enrollment(student)
