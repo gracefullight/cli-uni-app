@@ -15,6 +15,7 @@ from messages import (
 from utils.cmd import clear_screen
 from models.student import Student
 from services.student_service import StudentService
+from utils.password import validate_email, validate_password
 
 console = Console()
 
@@ -27,24 +28,50 @@ class StudentController:
 
     # Member 1: Responsible for Student Registration and Login
     def register(self) -> None:
-        """Register a new student with email/password validation."""
+        """Register a new student: Email/Password → validate → duplicate check → Name → enroll."""
+        from utils.password import validate_email, validate_password
         clear_screen()
         console.print(InfoMessages.STUDENT_SIGN_UP, style=Colors.SUCCESS)
-        first_name = console.input(Prompts.FIRST_NAME).strip()
-        last_name = console.input(Prompts.LAST_NAME).strip()
-        email = console.input(Prompts.EMAIL).strip().lower()
-        password = console.input(Prompts.PASSWORD, password=True).strip()
+
+        while True:
+            email = console.input("Email: ").strip().lower()
+            password = console.input("Password: ").strip()
+
+            if not validate_email(email) or not validate_password(password):
+                console.print("Incorrect email or password format", style=Colors.ERROR)
+
+                continue
+
+            console.print("Email and password formats acceptable", style=Colors.WARNING)
+
+    
+            existing = self.student_service.db.get_student_by_email(email)
+            if existing is not None:
+                console.print(f"Student {existing.first_name} {existing.last_name} already exists.", style=Colors.ERROR)
+                return  
+
+    
+            break
+
+    
+        full_name = console.input("Name: ").strip()
+        parts = [p for p in full_name.split() if p]
+        if len(parts) < 2:
+            console.print("Please enter both first and last name (e.g., 'Kevin Anderson').", style=Colors.ERROR)
+            return
+        first_name, last_name = parts[0], parts[-1]
+
+        console.print(f"Enrolling Student {first_name} {last_name}", style=Colors.WARNING)
 
         try:
-            ok, msg, _student = self.student_service.register(
-                first_name, last_name, email, password
-            )
+            ok, msg, _student = self.student_service.register(first_name, last_name, email, password)
             if not ok:
                 console.print(msg, style=Colors.ERROR)
             else:
                 console.print(msg)
         except ValueError as e:
             console.print(str(e), style=Colors.ERROR)
+
 
     # Member 1: Responsible for Student Registration and Login
     def login(self) -> Optional[Student]:
@@ -55,7 +82,7 @@ class StudentController:
         attempts = 0
         while attempts < MAX_LOGIN_ATTEMPTS:
             email = console.input(Prompts.LOGIN_EMAIL).strip().lower()
-            password = console.input(Prompts.LOGIN_PASSWORD, password=True).strip()
+            password = console.input(Prompts.LOGIN_PASSWORD).strip()
             try:
                 student = self.student_service.login(email, password)
                 return student

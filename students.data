@@ -31,5 +31,85 @@
         "grade": "HD"
       }
     ]
+  },
+  {
+    "student_id": "451617",
+    "first_name": "Kevin",
+    "last_name": "Anderson",
+    "email": "kevin.anderson@university.com",
+    "password": "$2b$12$KR0KIcLC40faSoemmiO.UueIR6hZ/R2i2s3NnlYUw4xA4zEu/Wyf2",
+    "subjects": []
+  },
+  {
+    "student_id": "772793",
+    "first_name": "James",
+    "last_name": "Holiday",
+    "email": "james.holiday@university.com",
+    "password": "$2b$12$avF.mxEs0X0LEfdqsIm2TO.YO3no5L1dwkJ3JckRLe.cv76sqt/8W",
+    "subjects": []
+  },
+  {
+    "student_id": "223242",
+    "first_name": "Lemon",
+    "last_name": "Tea",
+    "email": "lemon.tea@university.com",
+    "password": "$2b$12$NX/MaPOrAh4vQraiNc8di.6SoEnsZV8oXBol9iPFSHk50t9yI9n9m",
+    "subjects": []
+  },
+  {
+    "student_id": "792928",
+    "first_name": "Allen",
+    "last_name": "Kovac",
+    "email": "allen.kovac@university.com",
+    "password": "$2b$12$aFm8P65QyIGmZ1h9b2I5NudNiOYaoB3Fyk9.OkTSCP06Dxi.kkQDO",
+    "subjects": []
+  },
+  {
+    "student_id": "333482",
+    "first_name": "Christian",
+    "last_name": "Horner",
+    "email": "christian.horner@university.com",
+    "password": "$2b$12$lBQNHDjYtUGsKCMP3fFKmekxfJdLjBp8dRf6H8B0DkwB/7p1mqZb6",
+    "subjects": []
+  },
+  {
+    "student_id": "509749",
+    "first_name": "Lando",
+    "last_name": "Norris",
+    "email": "lando.norris@university.com",
+    "password": "$2b$12$iCQuYDe.0u75C85szMba3.IRPvAKMsKjfaKlkGnHW5gp8yadDHdVq",
+    "subjects": []
+  },
+  {
+    "student_id": "942056",
+    "first_name": "Oscar",
+    "last_name": "Piastri",
+    "email": "oscar.piastri@university.com",
+    "password": "$2b$12$XWWaThYqmH0RE0cAIVkSuOKtg93sF9iskJynUOKpz7nke/ygKEjXG",
+    "subjects": []
+  },
+  {
+    "student_id": "978261",
+    "first_name": "Lewis",
+    "last_name": "Hamilton",
+    "email": "lewis.hamilton@university.com",
+    "password": "$2b$12$PHvVsQy7z8nqLuNz7XiTz.qMGT/3q.TFCNWffE7xaJM2j4K7IpFHO",
+    "subjects": []
+  },
+  {
+    "student_id": "115139",
+    "first_name": "Pierre",
+    "last_name": "Ramon",
+    "email": "pierre.ramon@university.com",
+    "password": "$2b$12$AujYKPOOgrBnOhMGKlc.lu9DuNj1A0D1Z78VB.RFniWslTzs86MkK",
+    "subjects": []
+  },
+  {
+    "student_id": "999731",
+    "first_name": "Robin",
+    "last_name": "Hood",
+    "email": "robin.hood@university.com",
+    "password": "$2b$12$NEUSb30RFT3D554zJUwNguEyghdvdBl/J.7KNdhvnWd4wHZx8s3xC",
+    "subjects": []
   }
 ]

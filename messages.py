@@ -25,6 +25,8 @@ class Prompts:
     LAST_NAME = "Last name: "
     EMAIL = "Email (firstname.lastname@university.com): "
     PASSWORD = "Password (Start uppercase, 5+ letters, end with 3 digits): "
+    NAME = "Name (First Last): "
+
     
     # Login
     LOGIN_EMAIL = "Email: "
@@ -74,19 +76,21 @@ class ErrorMessages:
     """Error message templates"""
     
     # Validation Errors
-    INVALID_EMAIL_FORMAT = "Error: Invalid email format. Expected firstname.lastname@university.com"
-    INVALID_PASSWORD_FORMAT = "Error: Invalid password format. Must start uppercase, 5+ letters, end with 3 digits"
+    INVALID_EMAIL_FORMAT = "Incorrect email or password format. Expected firstname.lastname@university.com"
+    INVALID_PASSWORD_FORMAT = "Incorrect email or password format. Must start uppercase, 5+ letters, end with 3 digits"
     EMAIL_NAME_MISMATCH = "Error: Email name parts must match first and last name provided."
     INVALID_EMAIL_COMPONENTS = "Error: Invalid email format components."
     
     # Registration Errors
-    EMAIL_ALREADY_REGISTERED = "Error: Email already registered."
+    EMAIL_ALREADY_REGISTERED = "Student {first_name} {last_name} already exists."
     
     # Login Errors
     INCORRECT_FORMAT = "Incorrect email or password format"
     INVALID_CREDENTIALS = "Error: Invalid email or password."
     TOO_MANY_ATTEMPTS = "Too many failed attempts."
-    
+    STUDENT_NOT_FOUND_LOGIN = "Student does not exist."
+
+
     # Subject Errors
     SUBJECT_LIMIT_REACHED = "Error: Subject limit reached ({max_subjects})."
     SUBJECT_NAME_EMPTY = "Error: Subject name cannot be empty."
@@ -146,6 +150,9 @@ class InfoMessages:
     STATUS_PASS = "PASS"
     STATUS_FAIL = "FAIL"
     
+    # Format validation
+    FORMAT_OK = "Email and password formats acceptable."
+
     # Exit
     THANK_YOU = "Thank You"
 
