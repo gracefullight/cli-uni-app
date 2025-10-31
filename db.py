@@ -5,7 +5,6 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 from models.student import Student
 from utils.password import hash_password
 from constants import DATA_FILE
-from messages import ErrorMessages
 
 
 # This class is a shared responsibility, used by all members.
@@ -57,21 +56,11 @@ class Database:
         self, first_name: str, last_name: str, email: str, password: str
     ) -> Tuple[bool, str, Optional[Student]]:
         students = self._read_all()
-
-        if any((s.email or "").strip().lower() == (email or "").strip().lower() for s in students):
-            return (
-                False,
-                ErrorMessages.EMAIL_ALREADY_REGISTERED.format(
-                    first_name=first_name,
-                    last_name=last_name
-                ),
-                None,
-            )
-
+        if any(s.email == email for s in students):
+            return False, "Error: Email already registered.", None
         existing_ids = {s.student_id for s in students}
         student_id = Student.generate_id(existing_ids)
         hashed_password = hash_password(password)
-
         new_student = Student(
             student_id=student_id,
             first_name=first_name,
@@ -80,7 +69,6 @@ class Database:
             password=hashed_password,
             subjects=[],
         )
-
         students.append(new_student)
         self._write_all(students)
         return True, f"Success: Student registered with ID {student_id}.", new_student
@@ -109,5 +97,3 @@ class Database:
     # Member 3: Responsible for the Admin System
     def clear_all_students(self) -> None:
         self._write_all([])
-
-

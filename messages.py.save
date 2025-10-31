@@ -12,13 +12,13 @@ class Prompts:
     UNIVERSITY = "University System: (A)dmin, (S)tudent, or [X] : "
     
     # Student System
-    STUDENT_MENU = "Student System: [L]ogin, [R]egister, or X]: "
+    STUDENT_MENU = "Student System: [L]ogin, [R]egister, or X): "
     
     # Admin System
     ADMIN_MENU = "[C]lear Database, [G]roup Students, [P]artition Students, [R]emove Student, [S]how Students or [X]: "
     
     # Enrollment System
-    ENROLLMENT_OPTIONS = "Student Course Menu (c/e/r/s/x): "
+    ENROLLMENT_OPTIONS = "Select an option: "
     
     # Registration
     FIRST_NAME = "First name: "
@@ -54,12 +54,14 @@ class SuccessMessages:
     LOGIN = "Welcome, {first_name}!"
     
     # Enrollment
-    ENROLL = "Enrolling in Subject-{subject_id}"
+    ENROLL = "Success: Enrolled in {subject_name} with Subject ID {subject_id}. Mark: {mark}, Grade: {grade}"
     ENROLL_COUNT = "You are now enrolled in {count} out of {max_subjects} subjects."
     
     # Subject Removal
-    REMOVE_SUBJECT = "Dropping Subject - {subject_id}"
+    REMOVE_SUBJECT = "Dropping subject {subject_id}"
     
+    # Password
+    PASSWORD_CHANGED = "Success: Password changed."
     
     # Admin
     STUDENT_REMOVED = "Success: Student removed."
@@ -93,7 +95,7 @@ class ErrorMessages:
     NO_SUBJECTS_TO_REMOVE = "No subjects to remove."
     
     # Password Errors
-    PASSWORD_MISMATCH = "Passwords do not match - try again"
+    PASSWORD_MISMATCH = "Error: Password does not match."
     
     # Admin Errors
     STUDENT_NOT_FOUND = "Error: Student not found."
@@ -123,8 +125,8 @@ class InfoMessages:
     UPDATING_PASSWORD = "Updating Password"
     
     # Subject Menu
-    STUDENT_COURSE_MENU = "\tStudent Course Menu (c/e/r/s/x): "
-    # COURSE_MENU_OPTIONS = "[C]hange Password, [E]nroll Subject, [R]emove Subject, [S]how Enrollment, or [X]"
+    STUDENT_COURSE_MENU = "Student Course Menu ({first_name} {last_name} | ID: {student_id})"
+    COURSE_MENU_OPTIONS = "[C]hange Password, [E]nroll Subject, [R]emove Subject, [S]how Enrollment, or [X]"
     
     # Subject Display
     SHOWING_SUBJECTS = "Showing {count} subjects"
@@ -153,7 +155,7 @@ class FormatTemplates:
     """Output format templates"""
     
     # Subject Display
-    SUBJECT_ITEM = "[ Subject::{subject_id} -- mark = {mark} -- grade = {grade} ]"
+    SUBJECT_ITEM = "[{subject_id}] {name} - Mark: {mark}, Grade: {grade}"
     SUBJECT_LIST_ITEM = "[{subject_id}] {name}"
     
     # Student Display
@@ -230,10 +232,7 @@ class GUIMessages:
     NO_SUBJECTS_GUI = "No subjects enrolled."
     NO_SUBJECTS_TO_REMOVE_GUI = "No subjects to remove."
     ENROLLMENT_DEFAULT_TITLE = "Enrollment"
-    SUBJECT_DEFAULT_NAME = "Subject {number}"
-
-
-# ======================== Color Styles ========================
+    SUBJECT_DEFAU ======================== Color Styles ========================
 class Colors:
     """Color definitions for CLI output"""
 
@@ -253,4 +252,21 @@ class Colors:
     WARNING = "bold yellow"
 
     # Neutral/standard text
-    DEFAULT = "white"
+    DEFAULT = "white"LT_NAME = "Subject {number}"
+
+
+# ======================== Color Styles (for rich console) ========================
+class Colors:
+    """Color styles for rich console output"""
+    
+    CYAN = "cyan"
+    GREEN = "green"
+    YELLOW = "yellow"
+    RED = "red"
+    
+    # Semantic colors
+    HEADER = CYAN
+    SUCCESS = GREEN
+    WARNING = YELLOW
+    ERROR = RED
+    INFO = YELLOW
