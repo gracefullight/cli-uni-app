@@ -2,133 +2,108 @@
 
 ### Project Overview
 
-CLIUniApp and GUIUniApp together implement a small university management system with two interactive subsystems: Students and Admins. The CLI is the primary deliverable; the GUI is an optional companion to mirror the same flows.
+CLIUniApp and GUIUniApp deliver a shared university management backend with both command-line and graphical front ends.
 
-- **Students**: Register, login, enroll in up to 4 subjects, remove subjects, change password, and view enrolled subjects with marks and grades.
-- **Admins**: List students, group by dominant grade, partition pass/fail by average mark, remove students, and clear all data.
-- **Persistence**: All data is stored in a local file `students.data` (JSON), used by both CLI and GUI implementations.
+- **Student workflows**: secure registration, login, password changes, subject enrolment (max 4), subject removal, and viewing marks/grades generated via `utils/grade_calculator.py`.
+- **Admin workflows**: list and remove students, clear the datastore, group students by dominant grade, and partition cohorts by pass/fail status.
+- **Persistence**: both interfaces rely on a JSON datastore (`students.data`) managed by `db.Database`, ensuring consistent state across runs and interfaces.
+- **Architecture**: three-tier design—controllers for presentation, services for business rules, and models/database utilities for persistence.
 
-**Technologies**
-- **Language**: Python 3.x
-- **CLI**: Rich library
-- **GUI**: CustomTkinter
-- **Architecture**: 3-Tier (Presentation, Service, Data Access)
+### System Requirements
 
-### Group Member Contributions
+- Python **3.10 or newer** (project targets modern typing features).
+- Operating systems: macOS, Linux, or Windows with access to Python’s standard build.
+- Tk 8.6+ (bundled with most Python distributions) to support the CustomTkinter GUI.
+- Optional packaging tools:
+  - `pip` / `venv` (standard Python toolchain).
+  - [`uv`](https://github.com/astral-sh/uv) for lockfile-driven environments (supported via `uv.lock`).
 
-Our team divided the work based on architectural layers and features, allowing each member to specialize while collaborating on end-to-end functionality.
+### Installation & Setup
 
-#### Member 1 – Student Registration & Login Lead
+#### Quick Start (global Python)
 
-- **Primary Responsibility**: Core student authentication features.
-- **What**:
-  - Implemented the main university menu and student menu in the CLI.
-  - Built the student registration and login workflows, including all validation logic.
-  - Developed the password hashing and checking utilities.
-- **How**:
-  - Key Files: `cli.py`, `student_controller.py`, `student_service.py`, `utils/password.py`.
-  - Core Logic: `student_service.register`, `student_service.login`, `validate_email`, `validate_password`.
-  - Rules: Enforced email format (`firstname.lastname@university.com`) and password complexity (e.g., `StartsUpper123`).
-- **Why**:
-  - This role establishes the foundation of the student subsystem, ensuring secure and reliable access. Centralizing validation in the service layer ensures consistency across different interfaces (CLI/GUI).
-
-#### Member 2 – Subject & Enrollment Lead
-
-- **Primary Responsibility**: Student academic management.
-- **What**:
-  - Implemented the complete subject enrollment system, including creating, enrolling, and removing subjects.
-  - Developed the logic for calculating and assigning random marks and letter grades (HD, D, C, P, F).
-  - Created the system for calculating a student's average mark and passing status.
-- **How**:
-  - Key Files: `student_controller.py`, `student_service.py`, `models/subject.py`, `utils/grade_calculator.py`.
-  - Core Logic: `student_service.enroll_subject`, `student_service.remove_subject`, `Subject.create`, `calculate_grade`.
-  - Rules: Enforced a maximum of 4 subjects per student.
-- **Why**:
-  - This role owns the core academic functionality of the application. Encapsulating grade logic in the model and service layers makes the system clean and easy to maintain.
-
-#### Member 3 – Admin System Lead
-
-- **Primary Responsibility**: Administrative oversight and data analysis features.
-- **What**:
-  - Built all features for the admin subsystem: listing students, removing students, and clearing the database.
-  - Implemented the analytical features: grouping students by their dominant grade and partitioning them into pass/fail groups.
-- **How**:
-  - Key Files: `admin_controller.py`, `admin_service.py`, `cli.py`.
-  - Core Logic: `admin_service.list_students`, `admin_service.group_by_grade`, `admin_service.partition_pass_fail`.
-- **Why**:
-  - This role provides essential tools for system administrators to manage and monitor student data, offering valuable insights into academic performance.
-
-#### Member 4 – GUI Lead
-
-- **Primary Responsibility**: All aspects of the graphical user interface.
-- **What**:
-  - Developed a complete Tkinter-based GUI that mirrors the student-facing CLI flows.
-  - Implemented all GUI windows: Login, Enrollment Dashboard, View Subjects, Remove Subject, and Change Password.
-  - Handled UI state management, navigation, and user-friendly error dialogs.
-- **How**:
-  - Key Files: `gui.py`, `gui_student_controller.py`.
-  - Core Logic: Built reusable UI components and screen transition logic (`show_login_window`, `show_enrollment_window`, etc.). The GUI controller delegates all business logic to the `StudentService`.
-- **Why**:
-  - This role makes the application accessible to non-technical users. By reusing the same service layer as the CLI, we guarantee that business rules and data handling are 100% consistent across both interfaces.
-
-### Collaborative Feature Walkthrough: Student Registration
-
-To illustrate how we collaborated, let's walk through the "Student Registration" feature, which required contributions from multiple members:
-
-1.  **Member 1 (CLI & Service Logic)**:
-    - Defined the `register` method in the `StudentService`, which contains the core business logic: validating the email and password, checking for name mismatches, and calling the database to save the new student.
-    - Implemented the CLI prompts in `StudentController` to gather the user's first name, last name, email, and password.
-
-2.  **Member 4 (GUI Implementation)**:
-    - While no registration form exists in the current GUI, Member 4 built the `login` window, which follows a similar pattern. The `GUIStudentController` calls the same `student_service.login` method that the CLI uses, demonstrating how both interfaces share a common backend.
-
-3.  **Shared Infrastructure (All Members)**:
-    - The `Student` model, initially created by Member 1 & 2, provides the data structure.
-    - The `Database` class, with its `add_student` method, provides the persistence mechanism used by the service layer. This was a foundational piece of the project that all members relied on.
-
-This collaborative approach ensured that our application was built on a solid, reusable foundation, with a clear separation of concerns between the user interface, business logic, and data layers.
-
-### Architecture
-
-Our application is built using a 3-tier architecture to ensure a clean separation of concerns:
-
-1.  **Presentation Layer (UI)**:
-    - `cli.py`, `gui.py`, and the `controllers` package.
-    - This layer is responsible for all user interaction. It gathers input and displays results but contains no business logic. It delegates all actions to the service layer.
-
-2.  **Service Layer (Business Logic)**:
-    - The `services` package (`student_service.py`, `admin_service.py`).
-    - This is the core of the application. It contains all business rules, validation, and logic (e.g., a student can only enroll in 4 subjects). It acts as the single source of truth for all operations.
-
-3.  **Data Access Layer (DAL)**:
-    - `db.py`, `models` package, and `students.data` file.
-    - This layer is responsible for persisting data. It handles reading from and writing to the JSON data file and defines the data structures (`Student`, `Subject`).
-
-This architecture makes the system highly maintainable and scalable. For example, because the CLI and GUI both use the same service layer, we can be confident that they behave identically.
-
-### Setup and Run Instructions
-
-#### Requirements
-
-- Python 3.8+
-- `customtkinter`, `rich`, and `bcrypt` libraries.
-
-#### Installation
-
-1.  Clone the repository.
-2.  Install the required packages:
-    ```bash
-    pip install customtkinter rich bcrypt
-    ```
-
-#### Running the CLI
+For a fast run on a machine with Python 3.10+ already available:
 
 ```bash
-python3 cli.py
+python -m pip install rich customtkinter bcrypt
+python cli.py
 ```
 
-#### Running the GUI
+#### Option A – Python virtual environment + pip
 
-```bash
-python3 gui.py
-```
+1. Create a virtual environment.
+   ```bash
+   python -m venv .venv
+   ```
+2. Activate it.
+   - macOS/Linux: `source .venv/bin/activate`
+   - Windows (PowerShell): `.venv\Scripts\Activate.ps1`
+3. Upgrade packaging tools (recommended) and install the project in editable mode.
+   ```bash
+   pip install --upgrade pip setuptools
+   pip install -e .
+   ```
+   The editable install registers the console scripts `cliuniapp` and `guiuniapp` defined in `pyproject.toml`.
+
+#### Option B – uv-managed environment
+
+1. Ensure `uv` is installed (`pip install uv` or see the uv documentation).
+2. Sync dependencies and create the managed virtual environment.
+   ```bash
+   uv sync
+   ```
+   This respects `pyproject.toml` and `uv.lock`, generating `.venv/` automatically.
+3. Use `uv run` for ad-hoc commands without manual activation, or activate `.venv` as above if you prefer.
+
+> Both options install three runtime dependencies: `rich` for the CLI UI, `customtkinter` for the GUI, and `bcrypt` for secure password hashing.
+
+### Configurations
+
+Key runtime tunables live in `constants.py`:
+
+- `MAX_SUBJECTS_PER_STUDENT` (default 4) limits concurrent enrolments.
+- `PASSING_AVERAGE` defines the pass/fail threshold used by admin analytics.
+- `DATA_FILE` points to the JSON datastore (`students.data`). Change this to relocate persistent data or to use isolated datasets per environment.
+- `MAX_LOGIN_ATTEMPTS` caps consecutive failed logins before returning the user to the main menu.
+
+Additional behaviour is controlled via:
+
+- `messages.py`: centralised CLI copy, colors, and prompt strings used by both student and admin flows.
+- `utils/password.py`: password hashing and validation helpers. Adjust policies here if you tighten credential requirements.
+
+Whenever you modify configuration constants, delete or migrate the existing `students.data` file if schema changes are incompatible with previous data.
+
+### Run & Use
+
+#### CLI application
+
+- **pip/venv**: `python cli.py` or `python -m cli`.
+- **From console script**: `cliuniapp` (available after `pip install -e .`).
+- **uv**: `uv run cli.py` or `uv run cliuniapp`.
+
+CLI navigation highlights:
+
+- Main menu routes to Admin (`a`), Student (`s`), or Exit (`x`).
+- Student menu supports registration (`r`), login (`l`), and exit (`x`). Logged-in students can enrol (`e`), remove (`r`), inspect grades (`s`), or change passwords (`c`).
+- Admin menu provides list (`s`), remove (`r`), clear datastore (`c`), grade grouping (`g`), and pass/fail partitioning (`p`).
+
+#### GUI application
+
+- **pip/venv**: `python gui.py`.
+- **uv**: `uv run gui.py`.
+
+The GUI mirrors the student-facing flows with CustomTkinter windows for login, enrolment management, and password updates. Both interfaces operate on the same backend services, so you can mix usage (e.g., register via CLI, log in via GUI).
+
+#### Data management
+
+- Persistent records live in `students.data`. To reset the system, use the admin “Clear All” action or delete the file manually while the app is closed.
+- Passwords are stored hashed with `bcrypt`; do not edit them manually unless you re-hash the replacements.
+
+### Testing & Verification
+
+The repository does not currently include automated tests. Recommended manual checks:
+
+1. **Fresh datastore**: remove `students.data` (or use Clear All) and start the CLI to ensure a clean state.
+2. **Student flow**: register a new student, log in, enrol and remove subjects, and confirm grade display.
+3. **Admin analytics**: add multiple students with varying averages, then verify grouping (`g`) and pass/fail partitioning (`p`).
+4. **GUI parity**: launch `python gui.py`, log in with the CLI-created account, and confirm enrolment changes persist across interfaces.
