@@ -53,11 +53,10 @@ class CliApp:
     # Member 1: Responsible for Student Registration and Login
     def menu_student(self) -> None:
         while True:
-            student_choice = console.input(f"[{Colors.HEADER}]{Prompts.STUDENT_MENU}[/]").strip().lower()
+            student_choice = console.input(f"[{Colors.HEADER}]\t{Prompts.STUDENT_MENU}[/]").strip().lower()
             if student_choice == "l":
                 student = self.student_controller.login()
                 if student:
-                    clear_screen()
                     console.print(SuccessMessages.LOGIN.format(first_name=student.first_name), style=Colors.SUCCESS)
                     self.menu_subject_enrollment(student)
             elif student_choice == "r":
@@ -84,7 +83,7 @@ class CliApp:
             elif admin_choice == "x":
                 break
             else:
-                console.print(ErrorMessages.INVALID_OPTION, style=Colors.ERROR)
+                console.print(f"\t{ErrorMessages.INVALID_OPTION}", style=Colors.ERROR)
 
     # Member 2: Responsible for Subject Enrollment
     def menu_subject_enrollment(self, student) -> None:

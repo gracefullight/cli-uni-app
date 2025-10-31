@@ -29,68 +29,54 @@ class StudentController:
     # Member 1: Responsible for Student Registration and Login
     def register(self) -> None:
         """Register a new student: Email/Password → validate → duplicate check → Name → enroll."""
-        from utils.password import validate_email, validate_password
-        clear_screen()
-        console.print(InfoMessages.STUDENT_SIGN_UP, style=Colors.SUCCESS)
+        console.print(f"\t{InfoMessages.STUDENT_SIGN_UP}", style=Colors.SUCCESS)
 
         while True:
-            email = console.input("Email: ").strip().lower()
-            password = console.input("Password: ").strip()
+            email = console.input("\tEmail: ").strip().lower()
+            password = console.input("\tPassword: ").strip()
 
             if not validate_email(email) or not validate_password(password):
-                console.print("Incorrect email or password format", style=Colors.ERROR)
-
+                console.print("\tIncorrect email or password format", style=Colors.ERROR)
                 continue
 
-            console.print("Email and password formats acceptable", style=Colors.WARNING)
+            console.print("\tEmail and password formats acceptable", style=Colors.WARNING)
 
-    
             existing = self.student_service.db.get_student_by_email(email)
             if existing is not None:
-                console.print(f"Student {existing.first_name} {existing.last_name} already exists.", style=Colors.ERROR)
-                return  
+                console.print(f"\tStudent {existing.first_name} {existing.last_name} already exists.", style=Colors.ERROR)
+                return
 
-    
             break
 
-    
-        full_name = console.input("Name: ").strip()
+        full_name = console.input("\tName: ").strip()
         parts = [p for p in full_name.split() if p]
         if len(parts) < 2:
-            console.print("Please enter both first and last name (e.g., 'Kevin Anderson').", style=Colors.ERROR)
+            console.print("\tPlease enter both first and last name (e.g., 'Kevin Anderson').", style=Colors.ERROR)
             return
         first_name, last_name = parts[0], parts[-1]
 
-        console.print(f"Enrolling Student {first_name} {last_name}", style=Colors.WARNING)
-
-        try:
-            ok, msg, _student = self.student_service.register(first_name, last_name, email, password)
-            if not ok:
-                console.print(msg, style=Colors.ERROR)
-            else:
-                console.print(msg)
-        except ValueError as e:
-            console.print(str(e), style=Colors.ERROR)
+        console.print(f"\tEnrolling Student {first_name} {last_name}", style=Colors.WARNING)
+        
+        self.student_service.register(first_name, last_name, email, password)
 
 
     # Member 1: Responsible for Student Registration and Login
     def login(self) -> Optional[Student]:
         """Login with email/password, max 3 attempts."""
-        clear_screen()
-        console.print(InfoMessages.STUDENT_SIGN_IN, style=Colors.SUCCESS)
+        console.print(f"\t{InfoMessages.STUDENT_SIGN_IN}", style=Colors.SUCCESS)
 
         attempts = 0
         while attempts < MAX_LOGIN_ATTEMPTS:
-            email = console.input(Prompts.LOGIN_EMAIL).strip().lower()
-            password = console.input(Prompts.LOGIN_PASSWORD).strip()
+            email = console.input(f"\t{Prompts.LOGIN_EMAIL}").strip().lower()
+            password = console.input(f"\t{Prompts.LOGIN_PASSWORD}").strip()
             try:
                 student = self.student_service.login(email, password)
                 return student
             except ValueError as e:
-                console.print(str(e), style=Colors.ERROR)
+                console.print(f"\t{str(e)}", style=Colors.ERROR)
                 attempts += 1
                 continue
-        console.print(ErrorMessages.TOO_MANY_ATTEMPTS, style=Colors.ERROR)
+        console.print(f"\t{ErrorMessages.TOO_MANY_ATTEMPTS}", style=Colors.ERROR)
         return None
 
     # Member 2: Responsible for Subject Enrollment and Grade Calculation

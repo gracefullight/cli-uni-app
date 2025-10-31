@@ -12,10 +12,7 @@ class Prompts:
     UNIVERSITY = "University System: (A)dmin, (S)tudent, or X : "
     
     # Student System
-    STUDENT_MENU = "Student System: [L]ogin, [R]egister, or X): "
-    
-    # Admin System
-    ADMIN_MENU = "[C]lear Database, [G]roup Students, [P]artition Students, [R]emove Student, [S]how Students or [X]: "
+    STUDENT_MENU = "Student System: (l/r/x): "
     
     # Enrollment System
     ENROLLMENT_OPTIONS = "Select an option: "

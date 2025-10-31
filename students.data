@@ -111,5 +111,13 @@
     "email": "robin.hood@university.com",
     "password": "$2b$12$NEUSb30RFT3D554zJUwNguEyghdvdBl/J.7KNdhvnWd4wHZx8s3xC",
     "subjects": []
+  },
+  {
+    "student_id": "685226",
+    "first_name": "tom",
+    "last_name": "tom",
+    "email": "tom.tom@university.com",
+    "password": "$2b$12$g4tZjePsuGgOZ9IBPquzJO/j5oE8VXPeCasUbygfouGTSF57haqr6",
+    "subjects": []
   }
 ]

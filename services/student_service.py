@@ -59,8 +59,8 @@ class StudentService:
         if not validate_email(email) or not validate_password(password):
             raise ValueError("Incorrect email or password format")
 
-        console.print("Email and password formats acceptable.", style="yellow")
-
+        console.print("\tEmail and password formats acceptable.", style="yellow")
+    
         student = self.db.get_student_by_email(email.lower())
         if student is None:
             raise ValueError("Student does not exist.")
