@@ -23,7 +23,6 @@ class StudentService:
     def __init__(self, db: Database) -> None:
         self.db = db
 
-    # Member 1: Responsible for Student Registration and Login
     def register(
         self, first_name: str, last_name: str, email: str, password: str
     ) -> Tuple[bool, str, Optional[Student]]:
@@ -43,7 +42,6 @@ class StudentService:
 
         return self.db.add_student(first_name, last_name, email, password)
 
-    # Member 1: Responsible for Student Registration and Login
     def login(self, email: str, password: str) -> Optional[Student]:
         """
         Validate and login student.
@@ -70,7 +68,6 @@ class StudentService:
 
         return student
 
-    # Member 2: Responsible for Subject Enrollment and Grade Calculation
     def enroll_subject(
         self, student: Student
     ) -> Tuple[Student, Subject]:
@@ -99,7 +96,6 @@ class StudentService:
 
         return (fresh, new_subject)
 
-    # Member 2: Responsible for Subject Enrollment and Grade Calculation
     def remove_subject(self, student: Student, subject_id: str) -> Student:
         """
         Remove a subject from student's enrollment.
@@ -130,7 +126,6 @@ class StudentService:
 
         return fresh
 
-    # Member 1: Responsible for Student Registration and Login
     def change_password(
         self, student: Student, new_password: str, confirm_password: str
     ) -> Student:

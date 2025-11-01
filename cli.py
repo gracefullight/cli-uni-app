@@ -33,7 +33,6 @@ class CliApp:
         self.student_controller = student_controller
         self.admin_controller = admin_controller
 
-    # ------------------------- Menu Rendering -------------------------
     # Member 1: Responsible for the main application flow
     def run(self) -> None:
         while True:

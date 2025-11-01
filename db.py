@@ -8,7 +8,6 @@ from constants import DATA_FILE
 from messages import ErrorMessages
 
 
-# This class is a shared responsibility, used by all members.
 class Database:
     """Simple JSON-file backed database for students and subjects."""
 
@@ -109,5 +108,3 @@ class Database:
     # Member 3: Responsible for the Admin System
     def clear_all_students(self) -> None:
         self._write_all([])
-
-

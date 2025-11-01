@@ -7,7 +7,6 @@ from models.student import Student
 from db import Database
 
 
-# Member 3: Responsible for the Admin System
 class AdminService:
     """Service for admin operations."""
 

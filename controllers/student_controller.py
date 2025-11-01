@@ -58,7 +58,6 @@ class StudentController:
         
         self.student_service.register(first_name, last_name, email, password)
 
-
     # Member 1: Responsible for Student Registration and Login
     def login(self) -> Optional[Student]:
         """Login with email/password, max 3 attempts."""

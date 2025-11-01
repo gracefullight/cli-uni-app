@@ -3,7 +3,6 @@
 from constants import Grades
 
 
-# Member 2: Responsible for Subject Enrollment and Grade Calculation
 def calculate_grade(mark: int | float) -> str:
     """Return grade string based on mark."""
     if mark >= Grades.THRESHOLDS[Grades.HD]:
