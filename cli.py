@@ -17,7 +17,6 @@ from messages import (
     InfoMessages,
     Colors,
 )
-from utils.cmd import clear_screen
 from controllers.student_controller import StudentController
 from controllers.admin_controller import AdminController
 from db import Database

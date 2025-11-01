@@ -11,9 +11,13 @@ CLIUniApp and GUIUniApp deliver a shared university management backend with both
 
 ### System Requirements
 
-- Python **3.10 or newer** (project targets modern typing features).
+- Python **3.10 or newer** – leverages structural pattern matching and modern typing used across services/controllers.
 - Operating systems: macOS, Linux, or Windows with access to Python’s standard build.
 - Tk 8.6+ (bundled with most Python distributions) to support the CustomTkinter GUI.
+- Core third-party libraries installed during setup:
+  - `rich` – provides coloured prompts, tables, and feedback in the CLI menus.
+  - `customtkinter` – supplies the themed widgets that power the GUI variant of the app.
+  - `bcrypt` – hashes and verifies student passwords so credentials are never stored in plaintext.
 - Optional packaging tools:
   - `pip` / `venv` (standard Python toolchain).
   - [`uv`](https://github.com/astral-sh/uv) for lockfile-driven environments (supported via `uv.lock`).
@@ -96,7 +100,7 @@ The GUI mirrors the student-facing flows with CustomTkinter windows for login, e
 
 #### Data management
 
-- Persistent records live in `students.data`. To reset the system, use the admin “Clear All” action or delete the file manually while the app is closed.
+- Persistent records live in `students.data`. To reset the system, use the admin "Clear All" action or delete the file manually while the app is closed.
 - Passwords are stored hashed with `bcrypt`; do not edit them manually unless you re-hash the replacements.
 
 ### Testing & Verification

@@ -10,7 +10,6 @@ from messages import (
     Colors,
 )
 from services.admin_service import AdminService
-from utils.grade_calculator import calculate_grade
 
 console = Console()
 

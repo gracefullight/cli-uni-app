@@ -12,7 +12,6 @@ from messages import (
     FormatTemplates,
     Colors,
 )
-from utils.cmd import clear_screen
 from models.student import Student
 from services.student_service import StudentService
 from utils.password import validate_email, validate_password

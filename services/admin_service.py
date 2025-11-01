@@ -3,7 +3,6 @@
 from typing import Dict, List, Tuple
 
 from constants import Grades
-from utils.grade_calculator import calculate_grade
 from models.student import Student
 from db import Database
 
