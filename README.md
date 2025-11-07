@@ -1,5 +1,12 @@
 ## CLIUniApp / GUIUniApp – University Management System
 
+| ID | Name |
+| --- | --- |
+| | Kevin Anderson |
+| | Paranav Singh |
+| 26043582 | Rithviknath Gali |
+| 26170530 | Eunkwang Shin |
+
 ### Project Overview
 
 CLIUniApp and GUIUniApp deliver a shared university management backend with both command-line and graphical front ends.
