@@ -41,6 +41,7 @@ class GuiApp:
         self._build_subject_window()
         self._build_remove_subject_window()
         self._build_change_password_window()
+        self._build_registration_window()
         self._build_login_window()
         self.show_login_window()
 
@@ -77,6 +78,9 @@ class GuiApp:
 
         btn_login = ctk.CTkButton(frame, text=GUIMessages.LOGIN_BUTTON, command=self._on_login)
         btn_login.pack(pady=10)
+
+        btn_register = ctk.CTkButton(frame, text=GUIMessages.REGISTER_BUTTON, command=self.show_registration_window)
+        btn_register.pack(pady=5)
 
         self._frames["login"] = frame
 
@@ -176,6 +180,57 @@ class GuiApp:
         btn_back.pack()
         self._frames["change_password"] = frame
 
+    def _build_registration_window(self) -> None:
+        frame = ctk.CTkFrame(self._container)
+
+        title = ctk.CTkLabel(
+            frame, text=GUIMessages.REGISTER_TITLE, font=("Arial", 24, "bold")
+        )
+        title.pack(pady=20)
+
+        lbl_first_name = ctk.CTkLabel(frame, text=GUIMessages.FIRST_NAME_LABEL, font=("Arial", 12))
+        lbl_first_name.pack(anchor="w", padx=50, pady=(10, 0))
+
+        self.entry_reg_first_name = ctk.CTkEntry(
+            frame, placeholder_text=GUIMessages.FIRST_NAME_PLACEHOLDER, width=300
+        )
+        self.entry_reg_first_name.pack(pady=(0, 10), padx=50)
+
+        lbl_last_name = ctk.CTkLabel(frame, text=GUIMessages.LAST_NAME_LABEL, font=("Arial", 12))
+        lbl_last_name.pack(anchor="w", padx=50, pady=(10, 0))
+
+        self.entry_reg_last_name = ctk.CTkEntry(
+            frame, placeholder_text=GUIMessages.LAST_NAME_PLACEHOLDER, width=300
+        )
+        self.entry_reg_last_name.pack(pady=(0, 10), padx=50)
+
+        lbl_email = ctk.CTkLabel(frame, text=GUIMessages.EMAIL_LABEL, font=("Arial", 12))
+        lbl_email.pack(anchor="w", padx=50, pady=(10, 0))
+
+        self.entry_reg_email = ctk.CTkEntry(
+            frame, placeholder_text=GUIMessages.EMAIL_PLACEHOLDER, width=300
+        )
+        self.entry_reg_email.pack(pady=(0, 10), padx=50)
+
+        lbl_password = ctk.CTkLabel(
+            frame, text=GUIMessages.PASSWORD_LABEL, font=("Arial", 12)
+        )
+        lbl_password.pack(anchor="w", padx=50, pady=(10, 0))
+
+        self.entry_reg_password = ctk.CTkEntry(
+            frame, placeholder_text=GUIMessages.PASSWORD_PLACEHOLDER, width=300, show="*"
+        )
+        self.entry_reg_password.pack(pady=(0, 10), padx=50)
+        self.entry_reg_password.bind("<Return>", lambda event: self._on_register())
+
+        btn_register = ctk.CTkButton(frame, text=GUIMessages.REGISTER_BUTTON, command=self._on_register)
+        btn_register.pack(pady=10)
+
+        btn_back = ctk.CTkButton(frame, text=GUIMessages.BACK_BUTTON, command=self.show_login_window)
+        btn_back.pack(pady=5)
+
+        self._frames["register"] = frame
+
     def show_login_window(self) -> None:
         self._clear_container()
         self._frames["login"].pack(fill="both", expand=True)
@@ -215,7 +270,7 @@ class GuiApp:
             for subj in self.current_student.subjects:
                 row = ctk.CTkFrame(self.subjects_holder, fg_color="transparent")
                 subject_text = FormatTemplates.GUI_SUBJECT_ROW.format(
-                    subject_id=subj.subject_id, name=subj.name
+                    subject_id=subj.subject_id
                 )
                 ctk.CTkLabel(row, text=subject_text, width=200, anchor="w").pack(
                     side="left", padx=5
@@ -243,7 +298,7 @@ class GuiApp:
         if self.current_student and self.current_student.subjects:
             for subj in self.current_student.subjects:
                 button_text = FormatTemplates.GUI_SUBJECT_ROW.format(
-                    subject_id=subj.subject_id, name=subj.name
+                    subject_id=subj.subject_id
                 )
                 ctk.CTkRadioButton(
                     self.remove_list_holder,
@@ -263,6 +318,11 @@ class GuiApp:
         self.entry_pw_confirm.delete(0, "end")
         self._frames["change_password"].pack(fill="both", expand=True)
 
+    def show_registration_window(self) -> None:
+        self._clear_container()
+        self._frames["register"].pack(fill="both", expand=True)
+        self.entry_reg_first_name.focus()
+
     def _on_login(self) -> None:
         email = self.entry_email.get().strip().lower()
         password = self.entry_password.get().strip()
@@ -274,6 +334,31 @@ class GuiApp:
         except ValueError as e:
             messagebox.showerror(GUIMessages.LOGIN_ERROR, str(e))
 
+    def _on_register(self) -> None:
+        first_name = self.entry_reg_first_name.get().strip()
+        last_name = self.entry_reg_last_name.get().strip()
+        email = self.entry_reg_email.get().strip().lower()
+        password = self.entry_reg_password.get().strip()
+
+        if not first_name or not last_name or not email or not password:
+            messagebox.showerror(GUIMessages.REGISTER_ERROR, "All fields are required.")
+            return
+
+        success, message, student = self.controller.register(first_name, last_name, email, password)
+        
+        if success:
+            success_msg = GUIMessages.REGISTER_SUCCESS.format(student_id=student.student_id)
+            messagebox.showinfo("Registration", success_msg)
+            # Clear registration fields
+            self.entry_reg_first_name.delete(0, "end")
+            self.entry_reg_last_name.delete(0, "end")
+            self.entry_reg_email.delete(0, "end")
+            self.entry_reg_password.delete(0, "end")
+            # Go back to login window
+            self.show_login_window()
+        else:
+            messagebox.showerror(GUIMessages.REGISTER_ERROR, message)
+
     def _on_enroll(self) -> None:
         if self.current_student is None:
             messagebox.showerror(GUIMessages.ENROLL_ERROR, GUIMessages.NO_STUDENT_LOGGED_IN)
@@ -284,7 +369,7 @@ class GuiApp:
                 self.current_student
             )
             success_msg = GUIMessages.ENROLL_SUCCESS.format(
-                name=new_subject.name,
+                name=f"Subject-{new_subject.subject_id}",
                 subject_id=new_subject.subject_id,
                 mark=new_subject.mark,
                 grade=new_subject.grade,

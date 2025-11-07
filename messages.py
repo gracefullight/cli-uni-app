@@ -124,7 +124,7 @@ class FormatTemplates:
     # GUI
     GUI_ENROLLMENT_TITLE = "Enrollment - {first_name} {last_name} ({student_id})"
     GUI_STUDENT_INFO = "Subjects: {num_subjects} | Average: {avg:.2f} | Status: {pass_fail}"
-    GUI_SUBJECT_ROW = "{subject_id} - {name}"
+    GUI_SUBJECT_ROW = "Subject-{subject_id}"
 
 
 # ======================== GUI Messages ========================
@@ -133,22 +133,29 @@ class GUIMessages:
     
     # Titles
     LOGIN_TITLE = "Student Login"
+    REGISTER_TITLE = "Student Registration"
     ENROLLMENT_TITLE = "Enrollment"
     SUBJECTS_TITLE = "Subjects"
     REMOVE_SUBJECT_TITLE = "Remove Subject"
     CHANGE_PASSWORD_TITLE = "Change Password"
     
     # Labels
+    FIRST_NAME_LABEL = "First Name:"
+    LAST_NAME_LABEL = "Last Name:"
     EMAIL_LABEL = "Email:"
     PASSWORD_LABEL = "Password:"
     NEW_PASSWORD_LABEL = "New password (Start uppercase, 5+ letters, end with 3 digits):"
     CONFIRM_PASSWORD_LABEL = "Confirm password:"
     
     # Placeholders
+    FIRST_NAME_PLACEHOLDER = "Enter first name"
+    LAST_NAME_PLACEHOLDER = "Enter last name"
     EMAIL_PLACEHOLDER = "Firstname.Lastname@university.com"
+    PASSWORD_PLACEHOLDER = "Start uppercase, 5+ letters, end with 3 digits"
     
     # Buttons
     LOGIN_BUTTON = "Login"
+    REGISTER_BUTTON = "Register"
     EXIT_BUTTON = "Exit"
     ENROLL_BUTTON = "Enroll"
     VIEW_SUBJECTS_BUTTON = "View Subjects"
@@ -158,9 +165,10 @@ class GUIMessages:
     BACK_BUTTON = "Back"
     REMOVE_BUTTON = "Remove"
     SAVE_BUTTON = "Save"
-
+    
     # Error Dialog Titles
     LOGIN_ERROR = "Login Error"
+    REGISTER_ERROR = "Registration Error"
     ENROLL_ERROR = "Enroll Error"
     REMOVE_ERROR = "Remove Error"
     PASSWORD_ERROR = "Password Error"
@@ -169,6 +177,7 @@ class GUIMessages:
     NO_STUDENT_LOGGED_IN = "No student logged in."
     
     # Success Messages
+    REGISTER_SUCCESS = "Registration successful! Student ID: {student_id}"
     ENROLL_SUCCESS = "Enrolled in {name} (ID {subject_id}) with mark {mark} and grade {grade}."
     SUBJECT_REMOVED = "Subject removed."
     PASSWORD_CHANGED = "Password changed successfully."

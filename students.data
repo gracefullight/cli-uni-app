@@ -131,5 +131,34 @@
         "grade": "HD"
       }
     ]
+  },
+  {
+    "student_id": "168954",
+    "first_name": "Pranav",
+    "last_name": "Singh",
+    "email": "pranav.singh@university.com",
+    "password": "$2b$12$VRbNvTDORivo3JM/HHQlYe9ANzblCeH4EeBj1gxr3O0KkQ5eM83ra",
+    "subjects": [
+      {
+        "subject_id": "831",
+        "mark": 19,
+        "grade": "F"
+      },
+      {
+        "subject_id": "451",
+        "mark": 97,
+        "grade": "HD"
+      },
+      {
+        "subject_id": "263",
+        "mark": 39,
+        "grade": "F"
+      },
+      {
+        "subject_id": "999",
+        "mark": 30,
+        "grade": "F"
+      }
+    ]
   }
 ]
