@@ -25,6 +25,17 @@ class GUIStudentController:
         """
         return self.student_service.login(email, password)
 
+    def register(
+        self, first_name: str, last_name: str, email: str, password: str
+    ) -> Tuple[bool, str, Optional[Student]]:
+        """
+        Register a new student.
+
+        Returns:
+            Tuple of (success, message, student)
+        """
+        return self.student_service.register(first_name, last_name, email, password)
+
     def enroll_subject(self, student: Student) -> Tuple[Student, Subject]:
         """
         Enroll student in a new subject.
@@ -36,7 +47,7 @@ class GUIStudentController:
         """
         # For the GUI, we use a simplified enroll_subject without a name
         # The service creates a default name.
-        return self.student_service.enroll_subject(student, f"Subject-{len(student.subjects) + 1}")
+        return self.student_service.enroll_subject(student)
 
     def remove_subject(self, student: Student, subject_id: str) -> Student:
         """
