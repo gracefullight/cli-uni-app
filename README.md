@@ -2,9 +2,9 @@
 
 | ID | Name |
 | --- | --- |
-| | Kevin Anderson |
-| | Paranav Singh |
+| 25692904 | Kevin Anderson |
 | 26043582 | Rithviknath Gali |
+| 26044115 | Paranav Singh |
 | 26170530 | Eunkwang Shin |
 
 ### Project Overview
